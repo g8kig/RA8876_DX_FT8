@@ -9,7 +9,6 @@
 #include "Process_DSP.h"
 #include <EEPROM.h>
 #include <Wire.h>
-#include "locator.h"
 #include <TimeLib.h>
 #include "options.h"
 #include "ADIF.h"
@@ -938,22 +937,16 @@ void receive_sequence(void)
 void set_RF_Gain(int rfgain)
 {
 
-  //float gain_setpoint;
-  //gain_setpoint = (float)rfgain / 32.0;
-  //amp1.gain(gain_setpoint);
-
   float gain_setpoint;
-  float DSP_Gain = 2.0;
-  gain_setpoint = ((float)rfgain / 32.0) * DSP_Gain ;
+  gain_setpoint = (float)rfgain / 32.0;
   amp1.gain(gain_setpoint);
-
 }
 
-  void set_Attenuator_Gain(float att_gain){
-  
-        in_left_amp.gain(att_gain);
-        in_right_amp.gain(att_gain);
-    }
+void set_Attenuator_Gain(float att_gain){
+
+      in_left_amp.gain(att_gain);
+      in_right_amp.gain(att_gain);
+  }
 
 
 
