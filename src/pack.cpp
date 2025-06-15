@@ -41,11 +41,11 @@ int32_t pack28s(const char *callsign, int *has_suffix)
     int32_t NTOKENS = 2063592L;
     int32_t MAX22 = 4194304L;
 
-    if (memcmp(callsign, CQ_, sizeof(CQ_)-1) == 0)
+    if (memcmp(callsign, CQ_, sizeof(CQ_) - 1) == 0)
         return 2;
-    if (memcmp(callsign, DE_, sizeof(DE_)-1) == 0)
+    if (memcmp(callsign, DE_, sizeof(DE_) - 1) == 0)
         return 0;
-    if (memcmp(callsign, QRZ_, sizeof(QRZ_)-1) == 0)
+    if (memcmp(callsign, QRZ_, sizeof(QRZ_) - 1) == 0)
         return 1;
 
     char c6[7] = "      ";
@@ -56,7 +56,7 @@ int32_t pack28s(const char *callsign, int *has_suffix)
         length++;
     }
 
-    if (length > 3 && memcmp(callsign + length - 2, SlashP, sizeof(SlashP)-1) == 0)
+    if (length > 3 && memcmp(callsign + length - 2, SlashP, sizeof(SlashP) - 1) == 0)
     {
         if (has_suffix != NULL)
             *has_suffix = 1;

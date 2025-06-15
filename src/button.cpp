@@ -33,8 +33,8 @@ extern RA8876_t3 tft;
 extern AudioControlSGTL5000 sgtl5000_1;
 extern Si5351 si5351;
 extern AudioAmplifier amp1;
-extern AudioAmplifier        in_left_amp;
-extern AudioAmplifier        in_right_amp;
+extern AudioAmplifier in_left_amp;
+extern AudioAmplifier in_right_amp;
 extern uint16_t currentFrequency;
 #define USB 2
 
@@ -875,6 +875,8 @@ void init_RxSw_TxSw(void)
 void Init_BoardVersionInput(void)
 {
   pinMode(Board_PIN, INPUT_PULLUP);
+  delay(10);
+  digitalRead(Board_PIN);
 }
 
 void RLY_Select_20to40(void)
@@ -942,13 +944,12 @@ void set_RF_Gain(int rfgain)
   amp1.gain(gain_setpoint);
 }
 
-void set_Attenuator_Gain(float att_gain){
+void set_Attenuator_Gain(float att_gain)
+{
 
-      in_left_amp.gain(att_gain);
-      in_right_amp.gain(att_gain);
-  }
-
-
+  in_left_amp.gain(att_gain);
+  in_right_amp.gain(att_gain);
+}
 
 void terminate_transmit_armed(void)
 {

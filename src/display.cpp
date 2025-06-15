@@ -33,7 +33,7 @@ int old_rtc_hour;
 
 void display_value(int x, int y, int value)
 {
-  char string[5]; 
+  char string[5];
   sprintf(string, "%4i", value);
 
   tft.textColor(YELLOW, BLACK);
@@ -44,7 +44,7 @@ void display_value(int x, int y, int value)
 
 void show_short(uint16_t x, uint16_t y, uint8_t variable)
 {
-  char string[4]; 
+  char string[4];
   sprintf(string, "%2i", variable);
   tft.textColor(YELLOW, BLACK);
   tft.setCursor(x, y);
@@ -54,8 +54,8 @@ void show_short(uint16_t x, uint16_t y, uint8_t variable)
 
 void show_wide(uint16_t x, uint16_t y, int variable)
 {
-  uint8_t string[7]; 
-  sprintf((char*)string, "%6i", variable);
+  uint8_t string[7];
+  sprintf((char *)string, "%6i", variable);
   tft.textColor(YELLOW, BLACK);
   tft.setCursor(x, y);
   tft.setFontSize(2, true);
@@ -65,7 +65,7 @@ void show_wide(uint16_t x, uint16_t y, int variable)
 void display_time(int x, int y)
 {
   getTeensy3Time();
-  char string[10]; 
+  char string[10];
   sprintf(string, "%2i:%2i:%2i", hour(), minute(), second());
 
   if (hour() < old_rtc_hour)
@@ -85,7 +85,7 @@ void display_time(int x, int y)
 void display_date(int x, int y)
 {
   getTeensy3Time();
-  char string[11]; 
+  char string[11];
   sprintf(string, "%2i/%2i/%4i", day(), month(), year());
   tft.textColor(WHITE, BLACK);
   tft.setCursor(x, y);
@@ -144,7 +144,7 @@ bool open_stationData_file(void)
 
 void display_station_data(int x, int y)
 {
-  char str[13]; 
+  char str[13];
   sprintf(str, "%7s %4s", Station_Call, Locator);
 
   tft.textColor(YELLOW, BLACK);
@@ -183,7 +183,7 @@ void display_revision_level(void)
   tft.setCursor(0, 300);
   tft.write("Gears & Pulleys", 15);
   tft.setCursor(0, 330);
-  tft.write(" Are Aligned", 12);
+  tft.write("Are Aligned", 12);
 }
 
 void show_degrees(uint16_t x, uint16_t y, int32_t variable)
@@ -237,7 +237,7 @@ void Be_Patient(void)
   tft.textColor(YELLOW, BLACK);
   tft.setCursor(0, 120);
   tft.setFontSize(2, true);
-  tft.write("Patience, Syncing", 18);
+  tft.write("Patience, Synching", 19);
 }
 
 void update_message_log_display(int mode)
