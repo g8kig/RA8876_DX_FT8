@@ -13,19 +13,19 @@
 #include <string.h>
 #include <stdio.h>
 
-
 static const char A0[43] = " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ+-./?";
 static const char A1[38] = " 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 static const char A3[11] = "0123456789";
 static const char A4[28] = " ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-static const char DE_[3] = "DE ";  //I found it necessary to modify the size of this array to get proper packing
-static const char QRZ_[4] = "QRZ ";//I found it necessary to modify the size of this array to get proper packing
-static const char CQ_[3] = "CQ ";//I found it necessary to modify the size of this array to get proper packing
+static const char DE_[4] = "DE ";
+static const char QRZ_[5] = "QRZ ";
+static const char CQ_[4] = "CQ ";
 static const char RRR[4] = "RRR";
 static const char RR73[5] = "RR73";
 static const char _73[3] = "73";
-static const char SlashP[2] = "/P";//I found it necessary to modify the size of this array to get proper packing
+static const char SlashP[3] = "/P";
+
 static const size_t ERROR_FLAG = 0xffffffff;
 
 // Pack a special token, a 22-bit hash code, or a valid base call
@@ -42,29 +42,29 @@ int32_t pack28s(const char *callsign, int *has_suffix)
     int32_t NTOKENS = 2063592L;
     int32_t MAX22 = 4194304L;
 
-    if (memcmp(callsign, CQ_, sizeof(CQ_) ) == 0)  //changed sizeof(CQ_)-1 to sizeof(CQ_) 
+    if (memcmp(callsign, CQ_, sizeof(CQ_) - 1) == 0)
         return 2;
-    if (memcmp(callsign, DE_, sizeof(DE_) ) == 0)  //changed sizeof(CQ_)-1 to sizeof(CQ_) 
+    if (memcmp(callsign, DE_, sizeof(DE_) - 1) == 0)
         return 0;
-    if (memcmp(callsign, QRZ_, sizeof(QRZ_) ) == 0) //changed sizeof(CQ_)-1 to sizeof(CQ_) 
+    if (memcmp(callsign, QRZ_, sizeof(QRZ_) - 1) == 0)
         return 1;
 
-    char c6[6] = "      "; //I found it neccessary to alter the size of this array to get proper packing
-    
+    char c6[7] = "      ";
+
     int length = 0;
     while (callsign[length] != ' ' && callsign[length] != 0)
     {
         length++;
     }
 
-    if (length > 3 && memcmp(callsign + length - 2, SlashP, sizeof(SlashP) ) == 0)  //changed sizeof(SlashP) -1 to sizeof(SlashP)
+    if (length > 3 && memcmp(callsign + length - 2, SlashP, sizeof(SlashP) - 1) == 0)
     {
         if (has_suffix != NULL)
             *has_suffix = 1;
         length -= 2;
     }
 
-    // Copy callsign intto 6 character buffer
+    // Copy callsign into 6 character buffer
     if (starts_with(callsign, "3DA0") && length <= 7)
     {
         // Work-around for Swaziland prefix: 3DA0XYZ -> 3D0XYZ
@@ -181,19 +181,19 @@ static size_t extra_arg_len(const char *arg_in, char *arg_out, size_t maxlen)
 int pack77_1(const char *msg, uint8_t *b77)
 {
     int32_t n28a = -1, n28b = 0;
-    if (memcmp(msg, CQ_, sizeof(CQ_)) == 0)
+    if (memcmp(msg, CQ_, sizeof(CQ_) - 1) == 0)
     {
-        msg += sizeof(CQ_);
+        msg += sizeof(CQ_) - 1;
         n28a = 2;
     }
-    if (memcmp(msg, DE_, sizeof(DE_)) == 0)
+    if (memcmp(msg, DE_, sizeof(DE_) - 1) == 0)
     {
-        msg += sizeof(DE_);
+        msg += sizeof(DE_) - 1;
         n28a = 0;
     }
-    if (memcmp(msg, QRZ_, sizeof(QRZ_)) == 0)
+    if (memcmp(msg, QRZ_, sizeof(QRZ_) - 1) == 0)
     {
-        msg += sizeof(QRZ_);
+        msg += sizeof(QRZ_) - 1;
         n28a = 1;
     }
 
