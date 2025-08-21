@@ -60,34 +60,26 @@ typedef enum _MsgColor
 } MsgColor;
 
 const uint32_t lcd_color_map[LastColor] = {
-        0x0000, // BLACK
-        0xffff,  // WHITE
-        0xf800, // RED
-        0x07e0, // GREEN
-        0x001f, // BLUE
-        0xffe0 // YELLOW
+    0x0000, // BLACK
+    0xffff, // WHITE
+    0xf800, // RED
+    0x07e0, // GREEN
+    0x001f, // BLUE
+    0xffe0  // YELLOW
 };
-
-
-
-
-int Check_Calling_Stations(int num_decoded);
 
 void process_selected_Station(int stations_decoded, int TouchIndex);
 
-void display_line(     bool right,    int line,    MsgColor background,    MsgColor textcolor,    const char *text);
+void display_line(bool right, int line, MsgColor background, MsgColor textcolor, const char *text);
 void display_messages(Decode new_decoded[], int decoded_messages);
-void clear_rx_region(void);
 void clear_qso_region(void);
-void display_queued_message(const char* msg);
-void display_txing_message(const char*msg);
+void display_queued_message(const char *msg);
+void display_txing_message(const char *msg);
 void display_qso_state(const char *txt);
 char *add_worked_qso(void);
 bool display_worked_qsos(void);
-
 int strindex(const char *s, const char *t);
 
-extern int Auto_QSO_State;
 extern struct Decode new_decoded[];
 extern size_t kMax_message_length;
 extern int was_txing;

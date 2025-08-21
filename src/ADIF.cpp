@@ -95,7 +95,7 @@ void make_time(void)
 void make_File_Name(void)
 {
   make_date();
-  sprintf((char *)file_name_string, "%s.adi", log_rtc_date_string);
+  sprintf(file_name_string, "%s.adi", log_rtc_date_string);
 }
 
 static void write_log_data(char *data)
@@ -108,7 +108,6 @@ static void write_log_data(char *data)
 void Open_Log_File(void)
 {
   Log_File = SD.open(file_name_string, FILE_WRITE);
-
   if (Log_File.size() == 0)
   {
     Log_File.println("ADIF EXPORT");

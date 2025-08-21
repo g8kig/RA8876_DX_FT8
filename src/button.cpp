@@ -64,14 +64,9 @@ int bfo_offset;
 int BandIndex;
 int Band_Minimum;
 int QSO_Fix;
-
 int CQ_Mode_Index;
 int Free_Index;
-
 int Map_Index;
-extern bool clr_pressed;
-extern bool free_text;
-extern bool tx_pressed;
 int Skip_Tx1;
 
 #define numButtons 23
@@ -88,7 +83,7 @@ int Skip_Tx1;
 
 #define numBands 7
 
-FreqStruct sBand_Data[] = {
+FreqStruct sBand_Data[NumBands] = {
 
     {7074,
      "7074"},
@@ -498,7 +493,6 @@ void executeButton(uint16_t index)
 
     sButtonData[0].state = 0;
     drawButton(0);
-
     break;
 
   case 1:
@@ -506,7 +500,6 @@ void executeButton(uint16_t index)
     {
       Beacon_On = 0;
       Beacon_State = 0;
-
     }
     else
     {
@@ -549,7 +542,6 @@ void executeButton(uint16_t index)
       QSO_Fix = 1;
     else
       QSO_Fix = 0;
-
     break;
 
   case 6:
@@ -558,7 +550,7 @@ void executeButton(uint16_t index)
     else
     {
       Auto_Sync = 1;
-      //Be_Patient();
+      // Be_Patient();
     }
     break;
 
@@ -952,7 +944,8 @@ void process_touch(void)
     FT8_Message_Touch = Xmit_message_Touch();
     check_WF_Touch();
     touch_count = 0;
-    if( !Tune_On &&  (draw_x > START_X_RIGHT  && draw_y > 120 && draw_y < 400) ) tx_pressed = true;
+    if (!Tune_On && (draw_x > START_X_RIGHT && draw_y > 120 && draw_y < 400))
+      tx_pressed = true;
   }
 }
 
@@ -978,7 +971,6 @@ void setup_Cal_Display(void)
 
   for (int i = 11; i < 23; i++)
     drawButton(i);
-
 
   for (int id = 15; id < 23; id++)
   {
