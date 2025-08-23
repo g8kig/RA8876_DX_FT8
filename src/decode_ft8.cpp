@@ -144,19 +144,27 @@ int ft8_decode(void)
       }
       else
       {
+        /* Some examples of what we need to support
+        'RR':   not set (3)
+        '':     not set (2)
+        'R+00': 0
+        'R-25': -25
+        '-13':  -13
+        '73':   not set (1)
+        'RR73': not set (3)
+        '+00':  0
+        */
+
         const char *ptr = locator;
         if (*ptr == 'R')
         {
           ptr++;
         }
 
-        if (isdigit(*ptr)) // prevent a RR73 from being processed as a received RSL
+        int received_RSL = atoi(ptr);
+        if (received_RSL != 73 /*1*/ && *ptr != 0 /*2*/ && *ptr != 'R' /*3*/)
         {
-          int received_RSL = atoi(ptr);
-          if (received_RSL != 73) // Prevents a 73 being decoded as a received RSL
-          {
-            new_decoded[num_decoded].received_snr = received_RSL;
-          }
+          new_decoded[num_decoded].received_snr = received_RSL;
         }
 
         // ignore hashed callsigns

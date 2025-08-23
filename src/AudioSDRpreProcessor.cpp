@@ -74,7 +74,8 @@ void AudioSDRpreProcessor::update(void)
   case 1:
   {
     int16_t temp = blockI->data[n_block - 1]; // save the most recent sample for the next buffer
-    memmove(blockI->data + 1, blockI->data, (n_block - 1) * sizeof(q15_t));
+    for (int i = n_block - 1; i > 0; i--)
+      blockI->data[i] = blockI->data[i - 1];
     blockI->data[0] = savedSample;
     savedSample = temp;
     break;
@@ -83,7 +84,8 @@ void AudioSDRpreProcessor::update(void)
   case -1:
   {
     int16_t temp = blockQ->data[n_block - 1]; // save the most recent sample for the next buffer
-    memmove(blockQ->data + 1, blockQ->data, (n_block - 1) * sizeof(q15_t));
+    for (int i = n_block - 1; i > 0; i--)
+      blockQ->data[i] = blockQ->data[i - 1];
     blockQ->data[0] = savedSample;
     savedSample = temp;
     break;
