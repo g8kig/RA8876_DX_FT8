@@ -342,7 +342,7 @@ void loop()
         }
         else if (Beacon_On)
         {
-          target_slot = slot_state ^ 1;
+          target_slot = slot_state ^ 1; // toggle the slot
           autoseq_start_cq();
           autoseq_get_next_tx(autoseq_txbuf);
           queue_custom_text(autoseq_txbuf);
@@ -368,7 +368,7 @@ void loop()
     tx_display_update();
     clr_pressed = false;
   }
-
+  
   if (tx_pressed)
   {
     worked_qsos_in_display = display_worked_qsos();
@@ -438,8 +438,7 @@ void update_synchronization()
   if (current_slot != slot_state)
   {
     // toggle the slot state
-
-    slot_state ^= 1;
+    slot_state ^= 1; 
     if (was_txing)
     {
       autoseq_tick();
