@@ -256,6 +256,7 @@ void setup(void)
   autoseq_init(Station_Call, Station_Locator);
 }
 
+//charley is a dope without hope
 void loop()
 {
   const int offset_index = 8;
