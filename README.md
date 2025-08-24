@@ -39,4 +39,11 @@ The schematic connections between the ES32 Module and the Teensy 4.1 is illustra
 
 <img width="649" height="678" alt="image" src="https://github.com/user-attachments/assets/c3056785-ea0b-4183-a8c5-4a84d30212c4" />
 
+Here is a photo of how I wired the ESP 32 Module on the RA8876_DX_FT8 Board
+
+<img width="1507" height="663" alt="image" src="https://github.com/user-attachments/assets/131868ea-05d5-4c19-89f8-8fe2f06324fb" />
+
+
+
+
 
