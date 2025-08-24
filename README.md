@@ -1,4 +1,4 @@
-RA8876_DX_FT8  June 11, 2025
+RA8876_DX_FT8  August 24, 2025
 
 Background
 Several years ago (June 2023) I put together a version of our FT 8 code based on the RA8876 Display.
