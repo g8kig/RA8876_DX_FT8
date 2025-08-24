@@ -30,3 +30,8 @@ Version 1.2
 In this version the device time can be synchonised to the Internet and reception reports uploaded to the PskReporter at https://www.pskreporter.info/
 This requires an external ESP32 module
 Please see https://github.com/g8kig/DX-FT8-TimeSync_PSKReporter for more information about constructing and programming the simple module that can be used with this transceiver
+
+And, here is a view of Stations Reported by W5BAA via my RA8876_DX_FT8 Rig via the Internet and PSK Reporter 
+
+<img width="744" height="562" alt="image" src="https://github.com/user-attachments/assets/7957ce8c-ee68-40d3-b92c-23a92bfb7b14" />
+
