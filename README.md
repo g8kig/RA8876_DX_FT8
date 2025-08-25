@@ -36,8 +36,10 @@ In addition this version includes the recent work by Paul, G8KIG, which may be f
 
 
 In this version the device time can be synchonised to the Internet and reception reports uploaded to the PskReporter at https://www.pskreporter.info/
-This requires an external ESP32 module
-Please see https://github.com/g8kig/DX-FT8-TimeSync_PSKReporter for more information about constructing and programming the simple module that can be used with this transceiver
+
+This requires an external ESP32 module.
+
+## Please see https://github.com/g8kig/DX-FT8-TimeSync_PSKReporter for more information about constructing and programming the simple module that can be used with this transceiver
 
 And, here is a view of Stations Reported by W5BAA via my RA8876_DX_FT8 Rig over the Internet to PSK Reporter 
 
@@ -56,6 +58,8 @@ Here is a photo of how I wired the ESP32 Module on the RA8876_DX_FT8 Board
 
 Finally, with the addition of the making FT8 Received Message reports to PSK Reporter the user may now define his Station Maidenhead Locator as a Six Character Locator.
 And, Station Data is now defined by a StationData.ini file. An examaple is shown below:
+
+# Eample StationData.ini File Contents
 
 ## [Station]
 ## Call=W5BAA
