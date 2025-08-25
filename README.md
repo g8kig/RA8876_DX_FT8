@@ -1,4 +1,4 @@
-#  RA8876_DX_FT8  August 24, 2025 V1.3
+#  RA8876_DX_FT8;  August 24, 2025  version V1.3
 
 ##  Background
 Several years ago (June 2023) I put together a version of our FT 8 code based on the RA8876 Display.
@@ -44,11 +44,12 @@ And, here is a view of Stations Reported by W5BAA via my RA8876_DX_FT8 Rig over 
 <img width="905" height="609" alt="image" src="https://github.com/user-attachments/assets/87348f00-5246-45a2-badb-a776d43db1e7" />
 
 
-The schematic connections between the ES32 Module and the Teensy 4.1 is illustrated below:
+The schematic connections between the ESP32 Module and the Teensy 4.1 is illustrated below:
 
 <img width="649" height="678" alt="image" src="https://github.com/user-attachments/assets/c3056785-ea0b-4183-a8c5-4a84d30212c4" />
 
-Here is a photo of how I wired the ESP 32 Module on the RA8876_DX_FT8 Board
+Here is a photo of how I wired the ESP32 Module on the RA8876_DX_FT8 Board
+## We found that it is best to mount the ESP32 Module beyond the edge of the RA8876 Board.
 
 <img width="1507" height="663" alt="image" src="https://github.com/user-attachments/assets/131868ea-05d5-4c19-89f8-8fe2f06324fb" />
 
