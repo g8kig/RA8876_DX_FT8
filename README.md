@@ -33,8 +33,7 @@ Please see https://github.com/g8kig/DX-FT8-TimeSync_PSKReporter for more informa
 
 And, here is a view of Stations Reported by W5BAA via my RA8876_DX_FT8 Rig over the Internet to PSK Reporter 
 
-<img width="744" height="562" alt="image" src="https://github.com/user-attachments/assets/7957ce8c-ee68-40d3-b92c-23a92bfb7b14" />
-
+<img width="905" height="609" alt="image" src="https://github.com/user-attachments/assets/87348f00-5246-45a2-badb-a776d43db1e7" />
 
 
 The schematic connections between the ES32 Module and the Teensy 4.1 is illustrated below:
