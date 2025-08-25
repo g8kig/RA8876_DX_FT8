@@ -1,6 +1,6 @@
-RA8876_DX_FT8  August 24, 2025
+#  RA8876_DX_FT8  August 24, 2025 V1.3
 
-Background
+##  Background
 Several years ago (June 2023) I put together a version of our FT 8 code based on the RA8876 Display.
 The RA887 Display Code and Interface Board were plagiarized from this site: https://oshwlab.com/k7mdl/v2-1_7-inch_teensy_pcb
 
@@ -17,15 +17,23 @@ So I designed and had  fabricated a board which works with either a DX-FT8 Five 
 or Seven Band Board with the only modification of replacing a user fabricated audio interface cable
 with a simple three pin header pin for a direct connection.
 
-I was pleased that the five boards that were fabricated by JCLPCB required no modification to work with my DX_FT8 boards. Please use this link for board design and ordering details:
+I was pleased that the five boards that were fabricated by JCLPCB required no modification to work with my DX_FT8 boards.
 
-Here is a view of the current project  software taken while I was operating portable in Cornwall, UK
+## Here is a view of the current project  software taken while I was operating portable in Cornwall, UK
+
 ![image](https://github.com/user-attachments/assets/f26551ef-ac85-4fd2-af9b-fd68c74b24ef)
 
+## Link To Board Fabrication Details
 Here is a link to the EasyEDA Board Schematic and PCB Design Drawing:
 https://oshwlab.com/chillmf20/v2-1_7-inch_teensy_pcb_copy_copy_copy
 
-Version 1.2
+
+## Version 1.3 Key Feature Updates
+
+This version includes the improved FT8 messaging that was developed for the DX_FT8 Project: https://github.com/chillmf/DX-FT8-Transceiver-Source-Code_V2
+
+In addition this version includes the recent work by Paul, G8KIG, which may be found here: https://github.com/g8kig/DX-FT8-TimeSync_PSKReporter
+
 
 In this version the device time can be synchonised to the Internet and reception reports uploaded to the PskReporter at https://www.pskreporter.info/
 This requires an external ESP32 module
