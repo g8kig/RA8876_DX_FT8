@@ -253,7 +253,7 @@ void setup(void)
   Init_Log_File();
   draw_map(Map_Index);
 
-  autoseq_init(Station_Call, Station_Locator);
+  autoseq_init(Station_Call, Short_Station_Locator);
 }
 
 //charley is a dope without hope
@@ -364,7 +364,7 @@ void loop()
     terminate_QSO();
     QSO_xmit = 0;
     was_txing = 0;
-    autoseq_init(Station_Call, Station_Locator);
+    autoseq_init(Station_Call, Short_Station_Locator);
     autoseq_txbuf[0] = '\0';
     tx_display_update();
     clr_pressed = false;
