@@ -54,6 +54,17 @@ Here is a photo of how I wired the ESP32 Module on the RA8876_DX_FT8 Board
 <img width="1507" height="663" alt="image" src="https://github.com/user-attachments/assets/131868ea-05d5-4c19-89f8-8fe2f06324fb" />
 
 
+Finally, with the addition of the making FT8 Received Message reports to PSK Reporter the user may now define his Station Maidenhead Locator as a Six Character Locator.
+And, Station Data is now defined by a StationData.ini file. An examaple is shown below:
+
+## [Station]
+## Call=W5BAA
+## Locator=EM00vn
+
+## Don't get excited, the Six CharacterStation  Maidenhead Locator is only used in making reports to PSK Reporter and is NOT used in FT8 Messages.
+
+
+
 
 
 
