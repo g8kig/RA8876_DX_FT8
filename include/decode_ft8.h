@@ -10,6 +10,12 @@
 
 int ft8_decode(void);
 
+extern   int max_sync_score;
+extern   int max_sync_score_index;
+extern   int auto_called;
+
+ 
+
 enum Sequence
 {
     Seq_RSL = 0,
@@ -30,6 +36,7 @@ struct Decode
     char target_locator[7];
     int slot;
     Sequence sequence;
+    int calling_CQ;
 };
 
 struct display_message_details
@@ -68,7 +75,12 @@ const uint32_t lcd_color_map[LastColor] = {
         0xffe0 // YELLOW
 };
 
-
+struct Called_Stations
+{
+    char call[14];
+    float distance;
+    int sync_score;
+};
 
 
 
@@ -83,6 +95,14 @@ void display_txing_message(const char*msg);
 void display_qso_state(const char *txt);
 char *add_worked_qso(void);
 bool display_worked_qsos(void);
+
+void display_call_list_item(int left, int line, MsgColor background, MsgColor textcolor, const char *text);
+void display_call_list(int number_calls);
+
+int check_call_list(int message_index);
+void look_for_valid_CQ_Call(void);
+void store_CQ_Call(void);
+void store_logged_CQ_Call(const char *call);
 
 int strindex(const char *s, const char *t);
 

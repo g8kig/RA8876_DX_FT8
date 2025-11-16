@@ -25,7 +25,6 @@
 #include "gen_ft8.h"
 #include "options.h"
 #include "ADIF.h"
-#include "AudioSDRpreProcessor.h"
 #include "main.h"
 #include "Geodesy.h"
 #include "PskInterface.h"
@@ -58,11 +57,13 @@ static bool worked_qsos_in_display = false;
 RA8876_t3 tft = RA8876_t3(RA8876_CS, RA8876_RESET);
 Si5351 si5351;
 
-AudioSDRpreProcessor preProcessor;
 AudioInputI2S i2s1;            // xy=120,212
+AudioAmplifier in_left_amp;
+AudioAmplifier in_right_amp;
 AudioEffectMultiply multiply2; // xy=285,414
 AudioEffectMultiply multiply1; // xy=287,149
 AudioSynthWaveformSine sine1;  // xy=289,244
+AudioSynthWaveformSine sine2;  // xy=289,244
 AudioFilterFIR fir1;           // xy=471,153
 AudioFilterFIR fir2;           // xy=472,413
 AudioMixer4 mixer1;            // xy=666,173
@@ -71,24 +72,14 @@ AudioAmplifier amp1;           // xy=859,151
 AudioOutputI2S i2s2;           // xy=868,258
 AudioRecordQueue audioQueue;   // xy=1027,149
 
-AudioAmplifier left_amp;
-AudioAmplifier right_amp;
-
-AudioAmplifier in_left_amp;
-AudioAmplifier in_right_amp;
 
 AudioConnection c11(i2s1, 0, in_left_amp, 0);
-AudioConnection c12(i2s1, 1, in_right_amp, 0);
-
-AudioConnection c13(in_left_amp, 0, preProcessor, 0);
-AudioConnection c14(in_right_amp, 0, preProcessor, 1);
-
-AudioConnection patchCord1(preProcessor, 0, multiply1, 0);
-AudioConnection patchCord2(preProcessor, 1, multiply2, 1);
-AudioConnection patchCord3(multiply2, fir2);
+AudioConnection patchCord1(in_left_amp, 0, multiply1, 0);
+AudioConnection patchCord2(in_left_amp, 0, multiply2, 0);
 AudioConnection patchCord4(multiply1, fir1);
+AudioConnection patchCord3(multiply2, fir2);
 AudioConnection patchCord5(sine1, 0, multiply1, 1);
-AudioConnection patchCord6(sine1, 0, multiply2, 0);
+AudioConnection patchCord6(sine2, 0, multiply2, 1);
 AudioConnection patchCord7(fir1, 0, mixer1, 0);
 AudioConnection patchCord8(fir1, 0, mixer2, 0);
 AudioConnection patchCord9(fir2, 0, mixer1, 1);
@@ -97,13 +88,13 @@ AudioConnection patchCord10(fir2, 0, mixer2, 1);
 AudioConnection c3(mixer2, 0, amp1, 0);
 AudioConnection patchCord13(amp1, audioQueue);
 
-AudioConnection c4(mixer1, 0, left_amp, 0);
-AudioConnection c5(mixer2, 0, right_amp, 0);
-
-AudioConnection c6(left_amp, 0, i2s2, 0);
-AudioConnection c7(right_amp, 0, i2s2, 1);
+AudioConnection c6(mixer1, 0, i2s2, 0);
+AudioConnection c7(mixer2, 0, i2s2, 1);
 
 AudioControlSGTL5000 sgtl5000; // xy=404,516
+
+
+
 
 q15_t __attribute__((aligned(4))) dsp_buffer[FFT_BASE_SIZE * 3];
 q15_t __attribute__((aligned(4))) dsp_output[FFT_SIZE * 2];
@@ -138,6 +129,9 @@ int target_slot;
 
 static void process_data();
 static void update_synchronization();
+
+extern int Valid_CQ_Candidate;
+
 
 // Helper function for updating TX region display
 void tx_display_update(void)
@@ -197,9 +191,7 @@ void setup(void)
   set_startup_freq();
 
   AudioMemory(100);
-  preProcessor.startAutoI2SerrorDetection();
-
-  RX_volume = 10;
+  RX_volume = 15;
   RF_Gain = 20;
 
   sgtl5000.enable();
@@ -212,20 +204,22 @@ void setup(void)
   sine1.frequency(10000);
   sine1.phase(0);
 
+  sine2.amplitude(1.0);
+  sine2.frequency(10000);
+  sine2.phase(90.0);
+
   fir1.begin(FIR_I, NUM_COEFFS);
   fir2.begin(FIR_Q, NUM_COEFFS);
 
   mixer1.gain(0, 0.4);
-  mixer1.gain(1, -0.4);
+  mixer1.gain(1, 0.4);
 
   mixer2.gain(0, 0.4);
-  mixer2.gain(1, 0.4);
+  mixer2.gain(1, -0.4);
 
   set_RF_Gain(RF_Gain);
   set_Attenuator_Gain(1.0);
 
-  left_amp.gain(0.2);
-  right_amp.gain(0.2);
 
   audioQueue.begin();
 
@@ -327,14 +321,14 @@ void loop()
         }
       }
 
-      // No valid response has received to advance auto sequencing.
+          // No valid response has received to advance auto sequencing.
       // Check TX retry is needed?
       // Yes => QSO_xmit = True;
       // No  => check in beacon mode?
       //       Yes => start_cq, QSO_xmit = True;
       //       No  => QSO_xmit = False;
       if (!QSO_xmit)
-      {
+      {  //Check if QSO_xmit
         // Check if retry is necessary
         if (autoseq_get_next_tx(autoseq_txbuf))
         {
@@ -350,7 +344,30 @@ void loop()
           QSO_xmit = 1;
           tx_display_update();
         }
-      }
+
+        else if (Auto_QSO)
+
+        { // Auto_QSO_Start
+
+          //if( max_sync_score > 0)  look_for_valid_CQ_Call();
+          
+
+          if(Valid_CQ_Candidate) {
+          process_selected_Station(master_decoded, max_sync_score_index);
+          autoseq_on_touch(&new_decoded[max_sync_score_index]);
+          autoseq_get_next_tx(autoseq_txbuf);
+          queue_custom_text(autoseq_txbuf);
+          QSO_xmit = 1;
+          tx_display_update();
+          //store_CQ_Call();
+          Valid_CQ_Candidate = 0;
+          }
+
+
+
+        } //Auto_QSO_End
+
+      }//Check if QSO_xmit End
     }
 
     decode_flag = 0;
@@ -383,7 +400,7 @@ void loop()
     log_display_flag = 0;
   }
 
-  if (!Tune_On && FT8_Touch_Flag && FT_8_TouchIndex < master_decoded)
+  if (!Tune_On &&  FT8_Touch_Flag && FT_8_TouchIndex < master_decoded)
   {
     process_selected_Station(master_decoded, FT_8_TouchIndex);
     autoseq_on_touch(&new_decoded[FT_8_TouchIndex]);
@@ -393,6 +410,7 @@ void loop()
     FT8_Touch_Flag = 0;
     tx_display_update();
   }
+
 
   update_synchronization();
   getTime();

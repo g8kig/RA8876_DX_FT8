@@ -66,7 +66,7 @@ static void extract_power(size_t offset)
     for (int j = 0; j < FFT_BASE_SIZE; j++)
     {
       int32_t FFT_Mag_10 = 10 * (int32_t)FFT_Magnitude[j];
-      mag_db[j] = 10.0f * log((float)FFT_Mag_10 + 0.1f);
+      mag_db[j] =( 10.0f * log((float)FFT_Mag_10 + 0.1f) ) - 20;
     }
 
     // Loop over two possible frequency bin offsets (for averaging)

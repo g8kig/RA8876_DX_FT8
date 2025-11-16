@@ -51,6 +51,13 @@ static int num_qsos = 0;
 
 static int validate_locator(const char *QSO_locator);
 
+int max_sync_score;
+int max_sync_score_index;
+Called_Stations call_list[100];  
+int auto_called;
+char CQ_Candidate;
+int Valid_CQ_Candidate;
+
 int ft8_decode(void)
 {
   // Find top candidates by Costas sync score and localize them in time and frequency
@@ -170,6 +177,13 @@ int ft8_decode(void)
           addReceivedRecord(call_from, frequency, display_RSL);
         }
 
+       // if (strcmp(call_to, "CQ") == 0 || strncmp(call_to, "CQ ") == 0)
+         if (strindex(new_decoded[num_decoded].call_to, "CQ") >= 0)
+          {new_decoded[num_decoded].calling_CQ = 1;}
+          else 
+          {new_decoded[num_decoded].calling_CQ = 0;}
+
+
         ++num_decoded;
       }
     }
@@ -229,9 +243,13 @@ void process_selected_Station(int stations_decoded, int TouchIndex)
   FT8_Touch_Flag = 0;
 }
 
+
+
+
 void display_messages(Decode new_decoded[], int decoded_messages)
 {
   clear_rx_region();
+  max_sync_score = 0;
 
   for (int i = 0; i < decoded_messages && i < MAX_RX_ROWS; i++)
   {
@@ -243,10 +261,22 @@ void display_messages(Decode new_decoded[], int decoded_messages)
     snprintf(message, MAX_LINE_LEN, "%s %s %s", call_to, call_from, locator);
     message[MAX_LINE_LEN-1] = '\0'; // Make sure it fits the display region
     MsgColor color = White;
-    if (strcmp(call_to, "CQ") == 0 || strncmp(call_to, "CQ ", 3) == 0)
-    {
-      color = Green;
+
+
+    if (new_decoded[i].calling_CQ == 1) {
+            color = Green;
+          //  if(new_decoded[i].sync_score> max_sync_score) {
+          //    max_sync_score = new_decoded[i].sync_score;
+          //    max_sync_score_index = i;
+         //   }
+
+        if(!check_call_list(i) )  {
+        Valid_CQ_Candidate = 1;
+        max_sync_score_index = i;
+         }
+
     }
+
     // Addressed me
     if (strncmp(call_to, Station_Call, CALLSIGN_SIZE) == 0)
     {
@@ -259,7 +289,49 @@ void display_messages(Decode new_decoded[], int decoded_messages)
     }
     display_line(false, i, Black, color, message);
   }
+
+
+  /*
+  if(Auto_QSO && max_sync_score > 0){
+    
+      if(!check_call_list(max_sync_score_index)) {                                            
+      strcpy(call_list[auto_called].call, new_decoded[max_sync_score_index].call_from);  //store candidate call so we do not duplicate call later
+      auto_called++;
+      Valid_CQ_Candidate = 1;
+      display_call_list(auto_called);
+      }
+
+      display_call_list_item(0, 10, Black, Yellow, new_decoded[max_sync_score_index].call_from);
+  }
+  */
+  
+
 }
+
+void look_for_valid_CQ_Call(void)
+{
+   if(!check_call_list(max_sync_score_index)) Valid_CQ_Candidate = 1;
+
+}
+
+void store_CQ_Call(void) {
+  strcpy(call_list[auto_called].call, new_decoded[max_sync_score_index].call_from);  //store candidate call so we do not duplicate call later
+  auto_called++;
+  //
+  display_call_list(auto_called);
+}
+
+
+void store_logged_CQ_Call(const char *call)
+{
+   strcpy(call_list[auto_called].call, call);  //store candidate call so we do not duplicate call later
+  auto_called++;
+  //
+  display_call_list(auto_called);
+}
+
+
+
 
 void display_line(bool right, int line, MsgColor background, MsgColor textcolor, const char *text)
 {
@@ -268,6 +340,27 @@ void display_line(bool right, int line, MsgColor background, MsgColor textcolor,
   tft.setCursor(right ? START_X_RIGHT : START_X_LEFT, START_Y + line * LINE_HT);
   tft.write((const uint8_t *)text, strlen(text));
 }
+
+void display_call_list_item(int left, int line, MsgColor background, MsgColor textcolor, const char *text)
+{
+  tft.setFontSize(2, true);
+  tft.textColor(lcd_color_map[textcolor], lcd_color_map[background]);
+  tft.setCursor(left, START_Y + line * LINE_HT);
+  tft.write((const uint8_t *)text, strlen(text));
+}
+
+void display_call_list(int number_calls) {
+
+    for (int i = 0; i < number_calls ; i++)
+    display_call_list_item(600, i, Black, Yellow, call_list[i].call);
+  
+
+}
+
+
+
+
+
 
 void clear_rx_region(void)
 {
@@ -343,4 +436,18 @@ bool display_worked_qsos(void)
   }
   ++pi;
   return true;
+}
+
+
+int check_call_list(int message_index) {
+
+  int test = 0;
+
+  for (int i = 0; i<auto_called; i++) {
+    if (strcmp(call_list[i].call, new_decoded[message_index].call_from) == 0 )  {     
+    display_line(true, 10, Black, Red, new_decoded[message_index].call_from);
+    test = 1;
+    }
+  }
+  return test;
 }

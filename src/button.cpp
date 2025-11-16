@@ -52,9 +52,11 @@ int FT8_Touch_Flag;
 int FT8_Message_Touch;
 int FT_8_TouchIndex;
 
-int Beacon_State;
+//int Beacon_State;
 int Beacon_On;
 int Auto_Sync;
+int Auto_QSO;
+
 
 uint16_t start_freq;
 int Arm_Tune;
@@ -145,16 +147,16 @@ ButtonStruct sButtonData[] = {
      /*h*/ button_height},
 
     {// button 3 display R/T status
-     /*text0*/ " Rx ",
-     /*text1*/ " Tx ",
+     /*text0*/ "Man",
+     /*text1*/ "Auto",
      /*blank*/ "    ",
      /*Active*/ 1,
      /*Displayed*/ 1,
      /*state*/ 0,
      /*x*/ 240,
      /*y*/ line1,
-     /*w*/ 0, // setting the width and height to 0 turns off touch response , display only
-     /*h*/ 0},
+     /*w*/ button_width, // setting the width and height to 0 turns off touch response , display only
+     /*h*/ button_height},
 
     {// button 4 CQ or free mode
      /*text0*/ " CQ ",
@@ -500,12 +502,12 @@ void executeButton(uint16_t index)
     if (!sButtonData[1].state)
     {
       Beacon_On = 0;
-      Beacon_State = 0;
+      //Beacon_State = 0;
     }
     else
     {
       Beacon_On = 1;
-      Beacon_State = 1;
+      //Beacon_State = 1;
     }
 
     delay(5);
@@ -527,7 +529,16 @@ void executeButton(uint16_t index)
     break;
 
   case 3:
-    // no code required, all dependent stuff works off of button state
+    if (!sButtonData[3].state)
+    {
+      Auto_QSO = 0;
+      delay(5);
+    }
+    else
+    {
+      Auto_QSO = 1;
+    }
+    delay(5);
     break;
 
   case 4:
@@ -827,7 +838,7 @@ void transmit_sequence(void)
   digitalWrite(RxSw_PIN, HIGH);
   delay(10);
   digitalWrite(TxSw_PIN, LOW);
-  set_xmit_button(true);
+  //set_xmit_button(true);
 }
 
 void receive_sequence(void)
@@ -835,13 +846,13 @@ void receive_sequence(void)
   digitalWrite(TxSw_PIN, HIGH);
   delay(10);
   digitalWrite(RxSw_PIN, LOW);
-  set_xmit_button(false);
+  //set_xmit_button(false);
 }
 
 void set_RF_Gain(int rfgain)
 {
   float gain_setpoint;
-  gain_setpoint = (float)rfgain / 32.0;
+  gain_setpoint =( (float)rfgain / 32.0) * 2;
   amp1.gain(gain_setpoint);
 }
 
@@ -857,7 +868,7 @@ void terminate_transmit_armed(void)
   delay(2);
   receive_sequence();
   sButtonData[3].state = false;
-  drawButton(3);
+  //drawButton(3);
 }
 
 int testButton(uint8_t index)
