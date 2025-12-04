@@ -852,7 +852,7 @@ void receive_sequence(void)
 void set_RF_Gain(int rfgain)
 {
   float gain_setpoint;
-  gain_setpoint =( (float)rfgain / 32.0) * 2;
+  gain_setpoint =( (float)rfgain / 32.0);
   amp1.gain(gain_setpoint);
 }
 

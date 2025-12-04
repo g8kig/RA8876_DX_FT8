@@ -132,6 +132,8 @@ static void update_synchronization();
 
 extern int Valid_CQ_Candidate;
 
+extern float raw_fft_max;
+
 
 // Helper function for updating TX region display
 void tx_display_update(void)
@@ -191,7 +193,8 @@ void setup(void)
   set_startup_freq();
 
   AudioMemory(100);
-  RX_volume = 15;
+  //RX_volume = 15;
+  RX_volume = 6;
   RF_Gain = 20;
 
   sgtl5000.enable();
@@ -260,6 +263,7 @@ void loop()
   if (DSP_Flag)
   {
     process_FT8_FFT();
+    show_decimal(0,500, raw_fft_max);
 
     if (xmit_flag)
     {
@@ -413,7 +417,6 @@ void loop()
 
 
   update_synchronization();
-  getTime();
 }
 
 time_t getTeensy3Time()
@@ -469,6 +472,7 @@ void update_synchronization()
     ft8_marker = 1;
     WF_counter = 0;
     tx_display_update();
+    getTime();
   }
 
   // Check if TX is intended

@@ -174,10 +174,8 @@ int ft8_decode(void)
         if (*call_from != '<')
         {
           uint32_t frequency = (sBand_Data[BandIndex].Frequency * 1000) + new_decoded[num_decoded].freq_hz;
-          addReceivedRecord(call_from, frequency, display_RSL);
         }
 
-       // if (strcmp(call_to, "CQ") == 0 || strncmp(call_to, "CQ ") == 0)
          if (strindex(new_decoded[num_decoded].call_to, "CQ") >= 0)
           {new_decoded[num_decoded].calling_CQ = 1;}
           else 
@@ -274,6 +272,8 @@ void display_messages(Decode new_decoded[], int decoded_messages)
         Valid_CQ_Candidate = 1;
         max_sync_score_index = i;
          }
+
+       
 
     }
 
