@@ -45,7 +45,7 @@ const int kMin_score = 40; // Minimum sync score threshold for candidates
 display_message_details display[10];
 Decode new_decoded[20];
 
-static const char *blank = "                  "; // 18 spaces
+static const char *blank = "                      "; // 22 spaces
 static char worked_qso_entries[MAX_QSO_ENTRIES][MAX_LINE_LEN] = {};
 static int num_qsos = 0;
 
@@ -54,7 +54,10 @@ static int validate_locator(const char *QSO_locator);
 int max_sync_score;
 int max_sync_score_index;
 Called_Stations call_list[100];  
+Called_Stations auto_logged_list[100];  
+
 int auto_called;
+int auto_logged;
 char CQ_Candidate;
 int Valid_CQ_Candidate;
 
@@ -263,17 +266,11 @@ void display_messages(Decode new_decoded[], int decoded_messages)
 
     if (new_decoded[i].calling_CQ == 1) {
             color = Green;
-          //  if(new_decoded[i].sync_score> max_sync_score) {
-          //    max_sync_score = new_decoded[i].sync_score;
-          //    max_sync_score_index = i;
-         //   }
-
+      
         if(!check_call_list(i) )  {
         Valid_CQ_Candidate = 1;
         max_sync_score_index = i;
          }
-
-       
 
     }
 
@@ -291,21 +288,6 @@ void display_messages(Decode new_decoded[], int decoded_messages)
   }
 
 
-  /*
-  if(Auto_QSO && max_sync_score > 0){
-    
-      if(!check_call_list(max_sync_score_index)) {                                            
-      strcpy(call_list[auto_called].call, new_decoded[max_sync_score_index].call_from);  //store candidate call so we do not duplicate call later
-      auto_called++;
-      Valid_CQ_Candidate = 1;
-      display_call_list(auto_called);
-      }
-
-      display_call_list_item(0, 10, Black, Yellow, new_decoded[max_sync_score_index].call_from);
-  }
-  */
-  
-
 }
 
 void look_for_valid_CQ_Call(void)
@@ -317,17 +299,21 @@ void look_for_valid_CQ_Call(void)
 void store_CQ_Call(void) {
   strcpy(call_list[auto_called].call, new_decoded[max_sync_score_index].call_from);  //store candidate call so we do not duplicate call later
   auto_called++;
-  //
-  display_call_list(auto_called);
+  
 }
 
 
 void store_logged_CQ_Call(const char *call)
 {
-   strcpy(call_list[auto_called].call, call);  //store candidate call so we do not duplicate call later
-  auto_called++;
-  //
-  display_call_list(auto_called);
+  
+
+  strcpy(auto_logged_list[auto_called].call, call);  //store candidate call so we do not duplicate call later
+  //display_logged_list(auto_logged%10);
+  auto_logged++;
+
+  //display_value(100,520, auto_logged);
+
+
 }
 
 
@@ -335,7 +321,7 @@ void store_logged_CQ_Call(const char *call)
 
 void display_line(bool right, int line, MsgColor background, MsgColor textcolor, const char *text)
 {
-  tft.setFontSize(2, true);
+  tft.setFontSize(1, true);
   tft.textColor(lcd_color_map[textcolor], lcd_color_map[background]);
   tft.setCursor(right ? START_X_RIGHT : START_X_LEFT, START_Y + line * LINE_HT);
   tft.write((const uint8_t *)text, strlen(text));
@@ -343,7 +329,7 @@ void display_line(bool right, int line, MsgColor background, MsgColor textcolor,
 
 void display_call_list_item(int left, int line, MsgColor background, MsgColor textcolor, const char *text)
 {
-  tft.setFontSize(2, true);
+  tft.setFontSize(1, true);
   tft.textColor(lcd_color_map[textcolor], lcd_color_map[background]);
   tft.setCursor(left, START_Y + line * LINE_HT);
   tft.write((const uint8_t *)text, strlen(text));
@@ -353,7 +339,21 @@ void display_call_list(int number_calls) {
 
     for (int i = 0; i < number_calls ; i++)
     display_call_list_item(600, i, Black, Yellow, call_list[i].call);
-  
+
+}
+
+void display_logged_list_item(int left, int line, MsgColor background, MsgColor textcolor, const char *text)
+{
+  tft.setFontSize(2, true);
+  tft.textColor(lcd_color_map[textcolor], lcd_color_map[background]);
+  tft.setCursor(left, START_Y + line * LINE_HT);
+  tft.write((const uint8_t *)text, strlen(text));
+}
+
+void display_logged_list(int number_calls) {
+
+    for (int i = 0; i < number_calls ; i++)
+    display_logged_list_item(600, i, Black, Yellow, auto_logged_list[i].call);
 
 }
 
@@ -445,7 +445,6 @@ int check_call_list(int message_index) {
 
   for (int i = 0; i<auto_called; i++) {
     if (strcmp(call_list[i].call, new_decoded[message_index].call_from) == 0 )  {     
-    display_line(true, 10, Black, Red, new_decoded[message_index].call_from);
     test = 1;
     }
   }

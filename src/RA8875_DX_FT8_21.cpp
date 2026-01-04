@@ -59,7 +59,6 @@ Si5351 si5351;
 
 AudioInputI2S i2s1;            // xy=120,212
 AudioAmplifier in_left_amp;
-AudioAmplifier in_right_amp;
 AudioEffectMultiply multiply2; // xy=285,414
 AudioEffectMultiply multiply1; // xy=287,149
 AudioSynthWaveformSine sine1;  // xy=289,244
@@ -193,7 +192,6 @@ void setup(void)
   set_startup_freq();
 
   AudioMemory(100);
-  //RX_volume = 15;
   RX_volume = 6;
   RF_Gain = 20;
 
@@ -263,7 +261,7 @@ void loop()
   if (DSP_Flag)
   {
     process_FT8_FFT();
-    show_decimal(0,500, raw_fft_max);
+    //show_decimal(0,520, raw_fft_max);
 
     if (xmit_flag)
     {
@@ -353,9 +351,6 @@ void loop()
 
         { // Auto_QSO_Start
 
-          //if( max_sync_score > 0)  look_for_valid_CQ_Call();
-          
-
           if(Valid_CQ_Candidate) {
           process_selected_Station(master_decoded, max_sync_score_index);
           autoseq_on_touch(&new_decoded[max_sync_score_index]);
@@ -363,12 +358,9 @@ void loop()
           queue_custom_text(autoseq_txbuf);
           QSO_xmit = 1;
           tx_display_update();
-          //store_CQ_Call();
+          store_CQ_Call();
           Valid_CQ_Candidate = 0;
           }
-
-
-
         } //Auto_QSO_End
 
       }//Check if QSO_xmit End

@@ -292,7 +292,7 @@ void display_revision_level(void)
   tft.setCursor(0, 330);
   tft.write("Are Aligned", 12);
 
-  delay(1000);
+  delay(5000);
 
   tft.fillRect(0, 100, 300, 400, BLACK);
 }
@@ -326,7 +326,7 @@ void Be_Patient(void)
 
 void update_message_log_display(int mode)
 {
-  const char blank[] = "                  ";
+  const char blank[] = "                      ";
 
   for (int i = 0; i < max_log_messages - 1; i++)
   {

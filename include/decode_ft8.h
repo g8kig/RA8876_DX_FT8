@@ -13,7 +13,7 @@ int ft8_decode(void);
 extern   int max_sync_score;
 extern   int max_sync_score_index;
 extern   int auto_called;
-
+extern   int auto_logged;
  
 
 enum Sequence
@@ -98,6 +98,9 @@ bool display_worked_qsos(void);
 
 void display_call_list_item(int left, int line, MsgColor background, MsgColor textcolor, const char *text);
 void display_call_list(int number_calls);
+
+void display_logged_list_item(int left, int line, MsgColor background, MsgColor textcolor, const char *text);
+void display_logged_list(int number_calls);
 
 int check_call_list(int message_index);
 void look_for_valid_CQ_Call(void);

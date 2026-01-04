@@ -502,12 +502,10 @@ void executeButton(uint16_t index)
     if (!sButtonData[1].state)
     {
       Beacon_On = 0;
-      //Beacon_State = 0;
     }
     else
     {
       Beacon_On = 1;
-      //Beacon_State = 1;
     }
 
     delay(5);
@@ -859,7 +857,6 @@ void set_RF_Gain(int rfgain)
 void set_Attenuator_Gain(float att_gain)
 {
   in_left_amp.gain(att_gain);
-  in_right_amp.gain(att_gain);
 }
 
 void terminate_transmit_armed(void)
