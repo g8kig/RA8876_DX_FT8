@@ -55,6 +55,7 @@ void display_time(int x, int y)
   {
     Init_Log_File();
     display_date(650, 30);
+    clear_auto_memories();
   }
 
   old_rtc_hour = hour();

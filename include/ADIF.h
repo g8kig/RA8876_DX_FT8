@@ -24,5 +24,6 @@ void write_ADIF_Log(void);
 void Init_Log_File(void);
 
 void set_Station_Coordinates();
+float Target_Distance(const char *target);
 
 #endif /* ADIF_H_ */

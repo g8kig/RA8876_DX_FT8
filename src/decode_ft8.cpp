@@ -46,15 +46,19 @@ display_message_details display[10];
 Decode new_decoded[20];
 
 static const char *blank = "                      "; // 22 spaces
+static const char *auto_blank = "             "; // 14 spaces
 static char worked_qso_entries[MAX_QSO_ENTRIES][MAX_LINE_LEN] = {};
 static int num_qsos = 0;
 
 static int validate_locator(const char *QSO_locator);
 
+const int auto_call_limit = 400;
+const int auto_logged_limit = 100;
+
 int max_sync_score;
 int max_sync_score_index;
-Called_Stations call_list[100];  
-Called_Stations auto_logged_list[100];  
+Called_Stations call_list[auto_call_limit]; 
+Called_Stations auto_logged_list[auto_logged_limit];
 
 int auto_called;
 int auto_logged;
@@ -149,13 +153,17 @@ int ft8_decode(void)
         new_decoded[num_decoded].slot = slot_state;
 
         raw_RSL = (float)cand.score;
-        display_RSL = (int)((raw_RSL - 248)) / 8;
+        display_RSL = (int)((raw_RSL - 235)) / 8;
         new_decoded[num_decoded].snr = display_RSL;
         new_decoded[num_decoded].sequence = Seq_RSL;
+
+
+        new_decoded[num_decoded].target_distance = 0;
 
         if (validate_locator(locator))
         {
           strcpy(new_decoded[num_decoded].target_locator, locator);
+          //new_decoded[num_decoded].target_distance = (int) Target_Distance(locator);
           new_decoded[num_decoded].sequence = Seq_Locator;
         }
         else
@@ -251,72 +259,86 @@ void display_messages(Decode new_decoded[], int decoded_messages)
 {
   clear_rx_region();
   max_sync_score = 0;
+  Valid_CQ_Candidate = 0;
 
-  for (int i = 0; i < decoded_messages && i < MAX_RX_ROWS; i++)
-  {
-    const char *call_to = new_decoded[i].call_to;
-    const char *call_from = new_decoded[i].call_from;
-    const char *locator = new_decoded[i].locator;
+    for (int i = 0; i < decoded_messages && i < MAX_RX_ROWS; i++)
+    {
+      const char *call_to = new_decoded[i].call_to;
+      const char *call_from = new_decoded[i].call_from;
+      const char *locator = new_decoded[i].locator;
 
-    char message[MAX_MSG_LEN];
-    snprintf(message, MAX_LINE_LEN, "%s %s %s", call_to, call_from, locator);
-    message[MAX_LINE_LEN-1] = '\0'; // Make sure it fits the display region
-    MsgColor color = White;
+      MsgColor color = White;
+      char message[MAX_MSG_LEN];
 
-
-    if (new_decoded[i].calling_CQ == 1) {
-            color = Green;
+      snprintf(message, MAX_LINE_LEN, "%s %s %s", call_to, call_from, locator);
+      message[MAX_LINE_LEN-1] = '\0'; // Make sure it fits the display region
       
+
+      if (new_decoded[i].calling_CQ == 1) {
+        color = Green;
+    
         if(!check_call_list(i) )  {
-        Valid_CQ_Candidate = 1;
-        max_sync_score_index = i;
-         }
 
-    }
+      //    if(!check_log_list(i) )  {
+        
+            if (new_decoded[i].sync_score > max_sync_score) {
+              max_sync_score = new_decoded[i].sync_score; 
+              max_sync_score_index = i;
+              Valid_CQ_Candidate = 1;
+            }
 
-    // Addressed me
-    if (strncmp(call_to, Station_Call, CALLSIGN_SIZE) == 0)
-    {
-      color = Red;
-    }
-    // Mark own TX in yellow (WSJT-X)
-    if (was_txing)
-    {
-      color = Yellow;
-    }
-    display_line(false, i, Black, color, message);
-  }
+          }
+      }
 
+      // Addressed me
+      if (strncmp(call_to, Station_Call, CALLSIGN_SIZE) == 0)
+      {
+        color = Red;
+      }
+      // Mark own TX in yellow (WSJT-X)
+      if (was_txing)
+      {
+        color = Yellow;
+      }
+      display_line(false, i, Black, color, message);
+    }
 
 }
 
-void look_for_valid_CQ_Call(void)
-{
-   if(!check_call_list(max_sync_score_index)) Valid_CQ_Candidate = 1;
-
-}
 
 void store_CQ_Call(void) {
   strcpy(call_list[auto_called].call, new_decoded[max_sync_score_index].call_from);  //store candidate call so we do not duplicate call later
-  auto_called++;
-  
+  //call_list[auto_called].sync_score = new_decoded[max_sync_score_index].sync_score;
+  auto_called ++;
+
 }
 
 
 void store_logged_CQ_Call(const char *call)
 {
-  
 
-  strcpy(auto_logged_list[auto_called].call, call);  //store candidate call so we do not duplicate call later
-  //display_logged_list(auto_logged%10);
+ strcpy(auto_logged_list[auto_called].call, call); //store candidate call so we do not duplicate call later
   auto_logged++;
-
-  //display_value(100,520, auto_logged);
-
-
+  display_value(0,520, auto_logged);
 }
 
+void clear_auto_memories(void) {
 
+    for(int i = 0; i < auto_called; i++){
+    strcpy(call_list[i].call, auto_blank); 
+    call_list[i].distance = 0.0;
+    call_list[i].sync_score = 0; 
+     }
+    auto_called = 0;
+
+    for(int j = 0; j < auto_logged; j++){
+    strcpy(call_list[j].call, auto_blank); 
+    call_list[j].distance = 0.0;
+    call_list[j].sync_score = 0; 
+     }
+    auto_logged = 0;
+
+}
 
 
 void display_line(bool right, int line, MsgColor background, MsgColor textcolor, const char *text)
@@ -354,7 +376,6 @@ void display_logged_list(int number_calls) {
 
     for (int i = 0; i < number_calls ; i++)
     display_logged_list_item(600, i, Black, Yellow, auto_logged_list[i].call);
-
 }
 
 
@@ -386,7 +407,7 @@ void display_queued_message(const char *msg)
 
 void display_txing_message(const char *msg)
 {
-  display_line(true, 0, Red, Black, blank);
+  display_line(true, 0, Black, Black, blank);
   display_line(true, 0, Red, White, msg);
 }
 
@@ -445,6 +466,18 @@ int check_call_list(int message_index) {
 
   for (int i = 0; i<auto_called; i++) {
     if (strcmp(call_list[i].call, new_decoded[message_index].call_from) == 0 )  {     
+    test = 1;
+    }
+  }
+  return test;
+}
+
+int check_log_list(int message_index) {
+
+  int test = 0;
+
+  for (int i = 0; i<auto_logged; i++) {
+    if (strcmp(auto_logged_list[i].call, new_decoded[message_index].call_from) == 0 )  {     
     test = 1;
     }
   }

@@ -179,7 +179,7 @@ static double distance(double lat1, double lon1, double lat2, double lon2)
   return acos(sin(lat1r) * sin(lat2r) + cos(lat1r) * cos(lat2r) * cos(lon2r - lon1r)) * EARTH_RAD;
 }
 
-static float Target_Distance(const char *target)
+float Target_Distance(const char *target)
 {
   LatLong ll = QRAtoLatLong(target);
   if (ll.isValid)

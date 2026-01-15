@@ -19,7 +19,7 @@
 #include "display.h"
 #include "button.h"
 #include "traffic_manager.h"
-#include "AudioStream.h"
+//#include "AudioStream.h"
 #include "filters.h"
 #include "constants.h"
 #include "gen_ft8.h"
@@ -359,7 +359,7 @@ void loop()
           QSO_xmit = 1;
           tx_display_update();
           store_CQ_Call();
-          Valid_CQ_Candidate = 0;
+          //Valid_CQ_Candidate = 0;
           }
         } //Auto_QSO_End
 

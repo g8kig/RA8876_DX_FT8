@@ -14,7 +14,7 @@ extern   int max_sync_score;
 extern   int max_sync_score_index;
 extern   int auto_called;
 extern   int auto_logged;
- 
+
 
 enum Sequence
 {
@@ -34,6 +34,7 @@ struct Decode
     int snr;
     int received_snr;
     char target_locator[7];
+    int target_distance;
     int slot;
     Sequence sequence;
     int calling_CQ;
@@ -103,9 +104,10 @@ void display_logged_list_item(int left, int line, MsgColor background, MsgColor 
 void display_logged_list(int number_calls);
 
 int check_call_list(int message_index);
-void look_for_valid_CQ_Call(void);
+int check_log_list(int message_index);
 void store_CQ_Call(void);
 void store_logged_CQ_Call(const char *call);
+void clear_auto_memories(void);
 
 int strindex(const char *s, const char *t);
 
