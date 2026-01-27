@@ -146,7 +146,7 @@ int ft8_decode(void)
         strcpy(new_decoded[num_decoded].call_to, call_to);
         strcpy(new_decoded[num_decoded].call_from, call_from);
         strcpy(new_decoded[num_decoded].locator, locator);
-        strcpy(new_decoded[num_decoded].decode_time, rtc_string);
+        //strcpy(new_decoded[num_decoded].decode_time, rtc_string);
 
         new_decoded[num_decoded].slot = slot_state;
 

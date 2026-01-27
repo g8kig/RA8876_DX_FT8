@@ -24,12 +24,12 @@ enum Sequence
 
 struct Decode
 {
-    char field1[14];
+    //char field1[14];
     char call_to[14];
     char call_from[14];
     char locator[7];
     int freq_hz;
-    char decode_time[10];
+    //char decode_time[10];
     int sync_score;
     int snr;
     int received_snr;
@@ -46,6 +46,7 @@ struct display_message_details
     int text_color;
 };
 
+/*
 struct Calling_Station
 {
     int number_times_called;
@@ -55,6 +56,7 @@ struct Calling_Station
     int received_RSL;
     Sequence sequence;
 };
+*/
 
 typedef enum _MsgColor
 {

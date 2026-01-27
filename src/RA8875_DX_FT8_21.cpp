@@ -261,7 +261,7 @@ void loop()
   if (DSP_Flag)
   {
     process_FT8_FFT();
-    //show_decimal(0,520, raw_fft_max);
+    
 
     if (xmit_flag)
     {
@@ -323,12 +323,6 @@ void loop()
         }
       }
 
-          // No valid response has received to advance auto sequencing.
-      // Check TX retry is needed?
-      // Yes => QSO_xmit = True;
-      // No  => check in beacon mode?
-      //       Yes => start_cq, QSO_xmit = True;
-      //       No  => QSO_xmit = False;
       if (!QSO_xmit)
       {  //Check if QSO_xmit
         // Check if retry is necessary
@@ -350,7 +344,6 @@ void loop()
         else if (Auto_QSO)
 
         { // Auto_QSO_Start
-
           if(Valid_CQ_Candidate) {
           process_selected_Station(master_decoded, max_sync_score_index);
           autoseq_on_touch(&new_decoded[max_sync_score_index]);
@@ -359,7 +352,6 @@ void loop()
           QSO_xmit = 1;
           tx_display_update();
           store_CQ_Call();
-          //Valid_CQ_Candidate = 0;
           }
         } //Auto_QSO_End
 
