@@ -55,6 +55,7 @@ void display_time(int x, int y)
   {
     Init_Log_File();
     display_date(650, 30);
+    clear_auto_memories();
   }
 
   old_rtc_hour = hour();
@@ -272,7 +273,7 @@ void display_revision_level(void)
   tft.write("Hardware: V3.0", 14);
 
   tft.setCursor(0, 160);
-  tft.write("Firmware: V1.3.1", 16);
+  tft.write("Firmware: V1.4", 14);
 
   tft.setCursor(0, 190);
   tft.write("W5BAA - WB2CBA", 14);
@@ -292,7 +293,7 @@ void display_revision_level(void)
   tft.setCursor(0, 330);
   tft.write("Are Aligned", 12);
 
-  delay(1000);
+  delay(5000);
 
   tft.fillRect(0, 100, 300, 400, BLACK);
 }
@@ -326,7 +327,7 @@ void Be_Patient(void)
 
 void update_message_log_display(int mode)
 {
-  const char blank[] = "                  ";
+  const char blank[] = "                      ";
 
   for (int i = 0; i < max_log_messages - 1; i++)
   {

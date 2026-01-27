@@ -71,8 +71,9 @@ void sync_FT8(void);
 int testButton(uint8_t index);
 
 extern int QSO_xmit;
-extern int Beacon_State;
+//extern int Beacon_State;
 extern int Beacon_On;
+extern int Auto_QSO;
 extern uint8_t RX_volume;
 extern int RF_Gain;
 extern uint16_t display_cursor_line;
