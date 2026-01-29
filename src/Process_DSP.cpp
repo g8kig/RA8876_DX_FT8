@@ -19,13 +19,12 @@ static q15_t FFT_Scale[FFT_SIZE * 2];
 static q15_t FFT_Magnitude[FFT_SIZE];
 static uint8_t FFT_Buffer[FFT_BASE_SIZE];
 static float mag_db[FFT_BASE_SIZE + 1];
-
 static arm_rfft_instance_q15 fft_inst;
+static float raw_fft_max;
 
 static const size_t export_fft_power_size = ft8_msg_samples * ft8_buffer * 4;
 uint8_t export_fft_power[export_fft_power_size];
 
-float raw_fft_max;
 
 static float ft_blackman_i(int i, int N)
 {
@@ -70,8 +69,9 @@ static void extract_power(size_t offset)
     for (int j = 0; j < FFT_BASE_SIZE; j++)
     {
       int32_t FFT_Mag_10 = 10 * (int32_t)FFT_Magnitude[j];
-      mag_db[j] =( 10.0f * log((float)FFT_Mag_10 + 0.1f) );
-      if (mag_db[j] > raw_fft_max  ) raw_fft_max = mag_db[j];
+      mag_db[j] = (10.0f * log((float)FFT_Mag_10 + 0.1f));
+      if (mag_db[j] > raw_fft_max)
+        raw_fft_max = mag_db[j];
     }
 
     // Loop over two possible frequency bin offsets (for averaging)

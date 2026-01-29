@@ -146,7 +146,7 @@ LatLong QRAtoLatLong(const char *locator)
         loc[i] = toupper(loc[i]);
 
     double lon = -180.0 + (loc[0] - 'A') * 20.0; // 2 degrees
-    double lat = -90.0 + (loc[1] - 'A') * 10.0; // 1 degree
+    double lat = -90.0 + (loc[1] - 'A') * 10.0;  // 1 degree
 
     lon += (loc[2] - '0') * 2.0;
     lat += (loc[3] - '0') * 1.0;

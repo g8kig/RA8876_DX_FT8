@@ -18,7 +18,6 @@
 File stationData_File;
 
 static const int max_log_messages = 9;
-extern int log_display_flag;
 display_message_details log_messages[max_log_messages];
 char current_message[22];
 

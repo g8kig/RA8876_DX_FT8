@@ -10,11 +10,10 @@
 
 int ft8_decode(void);
 
-extern   int max_sync_score;
-extern   int max_sync_score_index;
-extern   int auto_called;
-extern   int auto_logged;
-
+extern int max_sync_score;
+extern int max_sync_score_index;
+extern int auto_called;
+extern int auto_logged;
 
 enum Sequence
 {
@@ -24,12 +23,10 @@ enum Sequence
 
 struct Decode
 {
-    //char field1[14];
     char call_to[14];
     char call_from[14];
     char locator[7];
     int freq_hz;
-    //char decode_time[10];
     int sync_score;
     int snr;
     int received_snr;
@@ -46,18 +43,6 @@ struct display_message_details
     int text_color;
 };
 
-/*
-struct Calling_Station
-{
-    int number_times_called;
-    char call[14];
-    char locator[7];
-    int RSL;
-    int received_RSL;
-    Sequence sequence;
-};
-*/
-
 typedef enum _MsgColor
 {
     Black = 0,
@@ -70,12 +55,12 @@ typedef enum _MsgColor
 } MsgColor;
 
 const uint32_t lcd_color_map[LastColor] = {
-        0x0000, // BLACK
-        0xffff,  // WHITE
-        0xf800, // RED
-        0x07e0, // GREEN
-        0x001f, // BLUE
-        0xffe0 // YELLOW
+    0x0000, // BLACK
+    0xffff, // WHITE
+    0xf800, // RED
+    0x07e0, // GREEN
+    0x001f, // BLUE
+    0xffe0  // YELLOW
 };
 
 struct Called_Stations
@@ -85,16 +70,14 @@ struct Called_Stations
     int sync_score;
 };
 
-
-
 void process_selected_Station(int stations_decoded, int TouchIndex);
 
-void display_line(     bool right,    int line,    MsgColor background,    MsgColor textcolor,    const char *text);
+void display_line(bool right, int line, MsgColor background, MsgColor textcolor, const char *text);
 void display_messages(Decode new_decoded[], int decoded_messages);
 void clear_rx_region(void);
 void clear_qso_region(void);
-void display_queued_message(const char* msg);
-void display_txing_message(const char*msg);
+void display_queued_message(const char *msg);
+void display_txing_message(const char *msg);
 void display_qso_state(const char *txt);
 char *add_worked_qso(void);
 bool display_worked_qsos(void);
@@ -116,5 +99,6 @@ int strindex(const char *s, const char *t);
 extern struct Decode new_decoded[];
 extern size_t kMax_message_length;
 extern int was_txing;
+extern int Valid_CQ_Candidate;
 
 #endif /* DECODE_FT8_H_ */

@@ -10,4 +10,4 @@ bool addSenderRecord(const char *callsign, const char *gridSquare, const char *s
 bool addReceivedRecord(const char *callsign, uint32_t frequency, uint8_t snr);
 bool sendRequest(void);
 
-#endif 
+#endif

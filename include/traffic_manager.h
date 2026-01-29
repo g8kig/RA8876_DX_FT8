@@ -13,6 +13,3 @@ void ft8_receive_sequence(void);
 void ft8_transmit_sequence(void);
 void terminate_QSO(void);
 void set_Rcvr_Freq(void);
-
-
-

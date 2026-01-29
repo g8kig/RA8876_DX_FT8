@@ -17,8 +17,6 @@ struct Map_Memory
     float ADIF_map_bearing;
 };
 
-
-
 void draw_map(int16_t index);
 void write_ADIF_Log(void);
 void Init_Log_File(void);
