@@ -179,6 +179,7 @@ int ft8_decode(void)
         if (*call_from != '<')
         {
           uint32_t frequency = (sBand_Data[BandIndex].Frequency * 1000) + new_decoded[num_decoded].freq_hz;
+          addReceivedRecord(call_from, frequency, display_RSL);
         }
 
         if (strindex(new_decoded[num_decoded].call_to, "CQ") >= 0)
