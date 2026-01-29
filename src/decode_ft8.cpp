@@ -301,7 +301,7 @@ void display_messages(Decode new_decoded[], int decoded_messages)
 void store_CQ_Call(void)
 {
 
-  const char blank[] = "             ";
+  const char blank[] = "              ";
 
   for (int i = 0; i < auto_call_limit - 1; i++)
   {

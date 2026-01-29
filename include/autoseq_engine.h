@@ -7,7 +7,7 @@
 #include "main.h"
 #include "button.h"
 
-#define MAX_MSG_LEN 38
+#define MAX_MSG_LEN 22
 #define MAX_LINE_LEN 22
 #define MAX_RX_ROWS 10
 #define MAX_QSO_ROWS 10
