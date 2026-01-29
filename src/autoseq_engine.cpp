@@ -80,8 +80,8 @@ static void write_worked_qso();
 void autoseq_init(const char *myCall, const char *myGrid)
 {
     memset(&ctx, 0, sizeof(ctx));
-    strncpy(ctx.mycall, myCall, CALLSIGN_SIZE);
-    strncpy(ctx.mygrid, myGrid, LOCATOR_SIZE);
+    strncpy(ctx.mycall, myCall, CALLSIGN_SIZE-1);
+    strncpy(ctx.mygrid, myGrid, LOCATOR_SIZE-1);
     ctx.state = AS_IDLE;
 }
 
