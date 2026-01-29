@@ -175,14 +175,7 @@ int ft8_decode(void)
           }
         }
 
-        if ((memcmp(new_decoded[num_decoded].call_to, "CQ\0", 3) == 0) || (memcmp(new_decoded[num_decoded].call_to, "CQ ", 3) == 0))
-        {
-          new_decoded[num_decoded].calling_CQ = 1;
-        }
-        else
-        {
-          new_decoded[num_decoded].calling_CQ = 0;
-        }
+        new_decoded[num_decoded].calling_CQ = (memcmp(new_decoded[num_decoded].call_to, "CQ\0", 3) == 0) || (memcmp(new_decoded[num_decoded].call_to, "CQ ", 3) == 0);
 
         // ignore hashed callsigns
         if (*call_from != '<')

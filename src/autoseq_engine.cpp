@@ -51,26 +51,26 @@ typedef struct
     tx_msg_t next_tx;
     tx_msg_t rcvd_msg_type;
 
-    char mycall[14];
-    char mygrid[7];
-    char dxcall[14];
-    char dxgrid[7];
+    char mycall[CALLSIGN_SIZE];
+    char mygrid[LOCATOR_SIZE];
+    char dxcall[CALLSIGN_SIZE];
+    char dxgrid[LOCATOR_SIZE];
     int snr_tx; /* SNR we report to DX (‑dB) */
     int retry_counter;
     int retry_limit;
     bool logged; /* true => QSO logged */
-
 } autoseq_ctx_t;
 
 static autoseq_ctx_t ctx;
 
 /*************** Forward declarations ****************/
 static void set_state(autoseq_state_t s, tx_msg_t first_tx, int limit);
-static void format_tx_text(tx_msg_t id, char out[MAX_MSG_LEN]);
+static void format_tx_text(tx_msg_t id, char *out);
 static void parse_rcvd_msg(const Decode *msg);
 // Internal helper called by autoseq_on_touch() and autoseq_on_decode()
 static bool generate_response(const Decode *msg, bool override);
 static void write_worked_qso();
+
 /******************************************************/
 
 /* ====================================================
@@ -80,8 +80,8 @@ static void write_worked_qso();
 void autoseq_init(const char *myCall, const char *myGrid)
 {
     memset(&ctx, 0, sizeof(ctx));
-    strncpy(ctx.mycall, myCall, sizeof(ctx.mycall) - 1);
-    strncpy(ctx.mygrid, myGrid, sizeof(ctx.mygrid) - 1);
+    strncpy(ctx.mycall, myCall, CALLSIGN_SIZE);
+    strncpy(ctx.mygrid, myGrid, LOCATOR_SIZE);
     ctx.state = AS_IDLE;
 }
 
@@ -100,9 +100,9 @@ void autoseq_on_touch(const Decode *msg)
         return;
 
     parse_rcvd_msg(msg);
-    if (strncmp(msg->call_to, ctx.mycall, 14) != 0)
+    if (strncmp(msg->call_to, ctx.mycall, LOCATOR_SIZE) != 0)
     {
-        // Not addresses me, treat it as if it's a CQ/TX6
+        // Not addresses to me, treat it as if it's a CQ/TX6
         ctx.rcvd_msg_type = TX6;
     }
     else
@@ -113,8 +113,8 @@ void autoseq_on_touch(const Decode *msg)
     }
 
     // Must be handling TX6
-    strncpy(ctx.dxcall, msg->call_from, sizeof(ctx.dxcall) - 1);
-    strncpy(ctx.dxgrid, msg->locator, sizeof(ctx.dxgrid) - 1);
+    strncpy(ctx.dxcall, msg->call_from, CALLSIGN_SIZE);
+    strncpy(ctx.dxgrid, msg->locator, LOCATOR_SIZE);
     ctx.snr_tx = msg->snr;
     set_state(Skip_Tx1 ? AS_REPORT : AS_REPLYING, Skip_Tx1 ? TX2 : TX1, MAX_TX_RETRY);
 }
@@ -126,19 +126,12 @@ bool autoseq_on_decode(const Decode *msg)
     if (!msg)
         return false;
 
-    // Not addresses me, return false
-    if (strncmp(msg->call_to, ctx.mycall, 14) != 0)
+    // Not addresses me or current QSO is in progress with a different dxcall, return false
+    if (strncmp(msg->call_to, ctx.mycall, CALLSIGN_SIZE) != 0 ||
+        ((ctx.state == AS_REPLYING || ctx.state == AS_REPORT || ctx.state == AS_ROGER_REPORT) &&
+         strncmp(msg->call_from, ctx.dxcall, CALLSIGN_SIZE) != 0))
     {
         return false;
-    }
-
-    // If the current QSO is still in progress, we ignore different dxcall
-    if (ctx.state == AS_REPLYING || ctx.state == AS_REPORT || ctx.state == AS_ROGER_REPORT)
-    {
-        if (strncmp(msg->call_from, ctx.dxcall, sizeof(ctx.dxcall)) != 0)
-        {
-            return false;
-        }
     }
 
     parse_rcvd_msg(msg);
@@ -147,7 +140,7 @@ bool autoseq_on_decode(const Decode *msg)
 }
 
 /* === Provide the message we should transmit this slot (if any) === */
-bool autoseq_get_next_tx(char out_text[MAX_MSG_LEN])
+bool autoseq_get_next_tx(char *out_text)
 {
     format_tx_text(ctx.next_tx, out_text);
 
@@ -155,18 +148,15 @@ bool autoseq_get_next_tx(char out_text[MAX_MSG_LEN])
         return false;
 
     /* Bump retry counter */
-    if (ctx.retry_limit)
+    if (ctx.retry_limit && ctx.retry_counter >= ctx.retry_limit)
     {
-        if (ctx.retry_counter >= ctx.retry_limit)
-        {
-            ctx.state = AS_SIGNOFF; /* give up */
-        }
+        ctx.state = AS_SIGNOFF; /* give up */
     }
     return true;
 }
 
 /* === Populate the string for displaying the current QSO state  === */
-void autoseq_get_qso_state(char out_text[MAX_LINE_LEN])
+void autoseq_get_qso_state(char *out_text)
 {
     if (!out_text)
     {
@@ -174,7 +164,7 @@ void autoseq_get_qso_state(char out_text[MAX_LINE_LEN])
     }
 
     out_text[0] = '\0';
-    // IDEL state is treated as no active QSO
+    // IDLE state is treated as no active QSO
     if (ctx.state == AS_IDLE)
     {
         return;
@@ -196,69 +186,53 @@ void autoseq_get_qso_state(char out_text[MAX_LINE_LEN])
              ctx.retry_counter);
 }
 
+static void set_next_state(autoseq_state_t next_state, tx_msg_t next_tx)
+{
+    ctx.state = next_state;
+    ctx.next_tx = next_tx;
+    if (next_state == AS_IDLE)
+    {
+        ctx.logged = false;
+    }
+}
+
+static void handle_state_retry(tx_msg_t tx_on_retry, autoseq_state_t next_state, tx_msg_t next_tx)
+{
+    if (ctx.retry_counter < ctx.retry_limit)
+    {
+        ctx.next_tx = tx_on_retry;
+        ctx.retry_counter++;
+    }
+    else
+    {
+        set_next_state(next_state, next_tx);
+    }
+}
+
 /* === Slot timer / time‑out manager === */
 void autoseq_tick(void)
 {
     switch (ctx.state)
     {
     case AS_REPLYING:
-        if (ctx.retry_counter < ctx.retry_limit)
-        {
-            ctx.next_tx = TX1;
-            ctx.retry_counter++;
-        }
-        else
-        {
-            ctx.state = AS_SIGNOFF;
-            ctx.next_tx = TX5;
-        }
+        handle_state_retry(TX1, AS_SIGNOFF, TX5);
         break;
 
     case AS_REPORT:
-        if (ctx.retry_counter < ctx.retry_limit)
-        {
-            ctx.next_tx = TX2;
-            ctx.retry_counter++;
-        }
-        else
-        {
-            ctx.state = AS_SIGNOFF;
-            ctx.next_tx = TX5;
-        }
+        handle_state_retry(TX2, AS_SIGNOFF, TX5);
         break;
 
     case AS_ROGER_REPORT:
-        if (ctx.retry_counter < ctx.retry_limit)
-        {
-            ctx.next_tx = TX3;
-            ctx.retry_counter++;
-        }
-        else
-        {
-            ctx.state = AS_SIGNOFF;
-            ctx.next_tx = TX5;
-        }
+        handle_state_retry(TX3, AS_SIGNOFF, TX5);
         break;
 
     case AS_ROGERS:
-        if (ctx.retry_counter < ctx.retry_limit)
-        {
-            ctx.next_tx = TX4;
-            ctx.retry_counter++;
-        }
-        else
-        {
-            ctx.state = AS_IDLE;
-            ctx.next_tx = TX_UNDEF;
-            ctx.logged = false;
-        }
+        handle_state_retry(TX4, AS_IDLE, TX_UNDEF);
         break;
 
     case AS_CALLING: // CQ is controlled by Beacon_On, so it's only once
     case AS_SIGNOFF:
-        ctx.state = AS_IDLE;
-        ctx.next_tx = TX_UNDEF;
-        ctx.logged = false;
+        set_next_state(AS_IDLE, TX_UNDEF);
         break;
     default:
         break;
@@ -277,8 +251,18 @@ static void set_state(autoseq_state_t s, tx_msg_t first_tx, int limit)
     ctx.retry_limit = limit;
 }
 
+static void log_and_write_qso()
+{
+    if (!ctx.logged)
+    {
+        write_ADIF_Log();
+        write_worked_qso();
+        ctx.logged = true;
+    }
+}
+
 /* Build printable FT8 text ("<CALL> <CALL> <LOC/RPT>") */
-static void format_tx_text(tx_msg_t id, char out[MAX_MSG_LEN])
+static void format_tx_text(tx_msg_t id, char *out)
 {
     if (!out)
     {
@@ -304,21 +288,11 @@ static void format_tx_text(tx_msg_t id, char out[MAX_MSG_LEN])
         break;
     case TX4:
         snprintf(out, MAX_MSG_LEN, "%s %s RR73", ctx.dxcall, ctx.mycall);
-        if (!ctx.logged)
-        {
-            write_ADIF_Log();
-            write_worked_qso();
-            ctx.logged = true;
-        }
+        log_and_write_qso();
         break;
     case TX5:
         snprintf(out, MAX_MSG_LEN, "%s %s 73", ctx.dxcall, ctx.mycall);
-        if (!ctx.logged)
-        {
-            write_ADIF_Log();
-            write_worked_qso();
-            ctx.logged = true;
-        }
+        log_and_write_qso();
         break;
     case TX6:
         if (!free_text)
@@ -345,10 +319,10 @@ static void format_tx_text(tx_msg_t id, char out[MAX_MSG_LEN])
             switch (Free_Index)
             {
             case 0:
-                strncpy(out, Free_Text1, 13);
+                strncpy(out, Free_Text1, MAX_MSG_LEN);
                 break;
             case 1:
-                strncpy(out, Free_Text2, 13);
+                strncpy(out, Free_Text2, MAX_MSG_LEN);
 
                 break;
             default:
@@ -367,7 +341,7 @@ static void parse_rcvd_msg(const Decode *msg)
     if (msg->sequence == Seq_Locator)
     {
         ctx.rcvd_msg_type = TX1;
-        strncpy(ctx.dxgrid, msg->locator, sizeof(ctx.dxgrid) - 1);
+        strncpy(ctx.dxgrid, msg->locator, LOCATOR_SIZE);
     }
     else
     {
@@ -375,11 +349,7 @@ static void parse_rcvd_msg(const Decode *msg)
         {
             ctx.rcvd_msg_type = TX5;
         }
-        else if (strcmp(msg->locator, "RR73") == 0)
-        {
-            ctx.rcvd_msg_type = TX4;
-        }
-        else if (strcmp(msg->locator, "RRR") == 0)
+        else if (strcmp(msg->locator, "RR73") == 0 || strcmp(msg->locator, "RRR") == 0)
         {
             ctx.rcvd_msg_type = TX4;
         }
@@ -403,7 +373,7 @@ static bool generate_response(const Decode *msg, bool override)
     }
 
     // Update the DX call and SNR
-    strncpy(ctx.dxcall, msg->call_from, sizeof(ctx.dxcall) - 1);
+    strncpy(ctx.dxcall, msg->call_from, CALLSIGN_SIZE);
     ctx.snr_tx = msg->snr;
 
     if (override)
@@ -431,7 +401,7 @@ static bool generate_response(const Decode *msg, bool override)
         }
     }
     // Populating Target_Call
-    strncpy(Target_Call, msg->call_from, 7);
+    strncpy(Target_Call, msg->call_from, CALLSIGN_SIZE);
 
     // Populating Station_RSL
     if (ctx.rcvd_msg_type == TX2 || ctx.rcvd_msg_type == TX3)
@@ -453,7 +423,7 @@ static bool generate_response(const Decode *msg, bool override)
         {
         case TX1:
             // Populate Target_Locator
-            strncpy(Target_Locator, msg->locator, 5);
+            strncpy(Target_Locator, msg->locator, LOCATOR_SIZE);
             set_state(AS_REPORT, TX2, MAX_TX_RETRY);
             return true;
         case TX2:
@@ -560,7 +530,8 @@ static void write_worked_qso()
     {
         return;
     }
-    char rsl[5]; // space + sign + 2 digits + null = 5
+
+    char rsl[RSL_SIZE]; // space + sign + 2 digits + null = 5
     // Check if RX RSL would fit
     int needed = snprintf(rsl, sizeof(rsl), " %d", Station_RSL);
     if (printed + needed <= MAX_LINE_LEN - 1)
