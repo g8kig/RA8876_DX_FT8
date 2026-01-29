@@ -19,8 +19,8 @@ struct ButtonStruct
 
 struct FreqStruct
 {
-	uint16_t Frequency;
-	char display[BAND_DATA_SIZE];
+  uint16_t Frequency;
+  char display[BAND_DATA_SIZE];
 };
 
 enum BandIndex
@@ -71,7 +71,6 @@ void sync_FT8(void);
 int testButton(uint8_t index);
 
 extern int QSO_xmit;
-//extern int Beacon_State;
 extern int Beacon_On;
 extern int Auto_QSO;
 extern uint8_t RX_volume;
@@ -91,10 +90,3 @@ extern int CQ_Mode_Index;
 extern int QSO_Fix;
 extern int FT8_Touch_Flag;
 extern int Skip_Tx1;
-
-
-
-
-
-
-

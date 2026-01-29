@@ -10,7 +10,7 @@
 
 #define sentinel 1948 // 1037, 1945, 1066,
 
-struct  OptionStruct
+struct OptionStruct
 {
   const char *Name;
   const int16_t Initial;

@@ -19,7 +19,6 @@
 #include "display.h"
 #include "button.h"
 #include "traffic_manager.h"
-//#include "AudioStream.h"
 #include "filters.h"
 #include "constants.h"
 #include "gen_ft8.h"
@@ -57,7 +56,7 @@ static bool worked_qsos_in_display = false;
 RA8876_t3 tft = RA8876_t3(RA8876_CS, RA8876_RESET);
 Si5351 si5351;
 
-AudioInputI2S i2s1;            // xy=120,212
+AudioInputI2S i2s1; // xy=120,212
 AudioAmplifier in_left_amp;
 AudioEffectMultiply multiply2; // xy=285,414
 AudioEffectMultiply multiply1; // xy=287,149
@@ -70,7 +69,6 @@ AudioMixer4 mixer2;            // xy=675,406
 AudioAmplifier amp1;           // xy=859,151
 AudioOutputI2S i2s2;           // xy=868,258
 AudioRecordQueue audioQueue;   // xy=1027,149
-
 
 AudioConnection c11(i2s1, 0, in_left_amp, 0);
 AudioConnection patchCord1(in_left_amp, 0, multiply1, 0);
@@ -92,9 +90,6 @@ AudioConnection c7(mixer2, 0, i2s2, 1);
 
 AudioControlSGTL5000 sgtl5000; // xy=404,516
 
-
-
-
 q15_t __attribute__((aligned(4))) dsp_buffer[FFT_BASE_SIZE * 3];
 q15_t __attribute__((aligned(4))) dsp_output[FFT_SIZE * 2];
 q15_t __attribute__((aligned(4))) input_gulp[FFT_BASE_SIZE * 5];
@@ -102,8 +97,6 @@ q15_t __attribute__((aligned(4))) input_gulp[FFT_BASE_SIZE * 5];
 char Station_Call[11];         // six character call sign + /0
 char Station_Locator[7];       // up to six character locator  + /0
 char Short_Station_Locator[5]; // four character locator  + /0
-
-uint16_t currentFrequency;
 
 uint32_t current_time, start_time, ft8_time;
 int ft8_flag;
@@ -128,11 +121,6 @@ int target_slot;
 
 static void process_data();
 static void update_synchronization();
-
-extern int Valid_CQ_Candidate;
-
-extern float raw_fft_max;
-
 
 // Helper function for updating TX region display
 void tx_display_update(void)
@@ -221,7 +209,6 @@ void setup(void)
   set_RF_Gain(RF_Gain);
   set_Attenuator_Gain(1.0);
 
-
   audioQueue.begin();
 
   start_time = millis();
@@ -251,7 +238,7 @@ void setup(void)
   autoseq_init(Station_Call, Short_Station_Locator);
 }
 
-//charley is a dope without hope
+// charley is a dope without hope
 void loop()
 {
   const int offset_index = 8;
@@ -261,7 +248,6 @@ void loop()
   if (DSP_Flag)
   {
     process_FT8_FFT();
-    
 
     if (xmit_flag)
     {
@@ -324,7 +310,7 @@ void loop()
       }
 
       if (!QSO_xmit)
-      {  //Check if QSO_xmit
+      { // Check if QSO_xmit
         // Check if retry is necessary
         if (autoseq_get_next_tx(autoseq_txbuf))
         {
@@ -340,22 +326,22 @@ void loop()
           QSO_xmit = 1;
           tx_display_update();
         }
-
         else if (Auto_QSO)
-
-        { // Auto_QSO_Start
-          if(Valid_CQ_Candidate) {
-          process_selected_Station(master_decoded, max_sync_score_index);
-          autoseq_on_touch(&new_decoded[max_sync_score_index]);
-          autoseq_get_next_tx(autoseq_txbuf);
-          queue_custom_text(autoseq_txbuf);
-          QSO_xmit = 1;
-          tx_display_update();
-          store_CQ_Call();
+        {
+          // Auto_QSO_Start
+          if (Valid_CQ_Candidate)
+          {
+            process_selected_Station(master_decoded, max_sync_score_index);
+            autoseq_on_touch(&new_decoded[max_sync_score_index]);
+            autoseq_get_next_tx(autoseq_txbuf);
+            queue_custom_text(autoseq_txbuf);
+            QSO_xmit = 1;
+            tx_display_update();
+            store_CQ_Call();
           }
-        } //Auto_QSO_End
+        } // Auto_QSO_End
 
-      }//Check if QSO_xmit End
+      } // Check if QSO_xmit End
     }
 
     decode_flag = 0;
@@ -374,7 +360,7 @@ void loop()
     tx_display_update();
     clr_pressed = false;
   }
-  
+
   if (tx_pressed)
   {
     worked_qsos_in_display = display_worked_qsos();
@@ -388,7 +374,7 @@ void loop()
     log_display_flag = 0;
   }
 
-  if (!Tune_On &&  FT8_Touch_Flag && FT_8_TouchIndex < master_decoded)
+  if (!Tune_On && FT8_Touch_Flag && FT_8_TouchIndex < master_decoded)
   {
     process_selected_Station(master_decoded, FT_8_TouchIndex);
     autoseq_on_touch(&new_decoded[FT_8_TouchIndex]);
@@ -398,7 +384,6 @@ void loop()
     FT8_Touch_Flag = 0;
     tx_display_update();
   }
-
 
   update_synchronization();
 }
@@ -444,11 +429,12 @@ void update_synchronization()
   if (current_slot != slot_state)
   {
     // toggle the slot state
-    slot_state ^= 1; 
+    slot_state ^= 1;
     if (was_txing)
     {
       autoseq_tick();
     }
+    
     was_txing = 0;
 
     ft8_flag = 1;
@@ -470,6 +456,7 @@ void update_synchronization()
 
     // Log the TX
     if (strindex(autoseq_txbuf, "CQ") < 0)
+    // ??? if ((memcmp(autoseq_txbuf, "CQ ", 3) == 0) || (memcmp(autoseq_txbuf, "CQ\0", 3) == 0))
     {
       strcpy(current_message, autoseq_txbuf);
       update_message_log_display(1);

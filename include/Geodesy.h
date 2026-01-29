@@ -19,7 +19,3 @@ VincentyResult VincentyDistance(double lat1, double long1, double lat2, double l
 double RadioHorizon(double height);
 bool IsValidLocator(const char *locator);
 LatLong QRAtoLatLong(const char *locator);
-
-
-
-

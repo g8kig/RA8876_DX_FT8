@@ -34,10 +34,10 @@ extern int target_slot;
 extern bool free_text;
 extern bool tx_pressed;
 extern bool clr_pressed;
+extern int log_display_flag;
 
 extern q15_t __attribute__((aligned(4))) dsp_buffer[];
 extern q15_t __attribute__((aligned(4))) dsp_output[];
 
-//void display_messages(int decoded_messages);
 void tx_display_update(void);
 time_t getTeensy3Time(void);

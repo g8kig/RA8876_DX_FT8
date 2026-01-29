@@ -52,11 +52,9 @@ int FT8_Touch_Flag;
 int FT8_Message_Touch;
 int FT_8_TouchIndex;
 
-//int Beacon_State;
 int Beacon_On;
 int Auto_Sync;
 int Auto_QSO;
-
 
 uint16_t start_freq;
 int Arm_Tune;
@@ -836,7 +834,6 @@ void transmit_sequence(void)
   digitalWrite(RxSw_PIN, HIGH);
   delay(10);
   digitalWrite(TxSw_PIN, LOW);
-  //set_xmit_button(true);
 }
 
 void receive_sequence(void)
@@ -844,13 +841,12 @@ void receive_sequence(void)
   digitalWrite(TxSw_PIN, HIGH);
   delay(10);
   digitalWrite(RxSw_PIN, LOW);
-  //set_xmit_button(false);
 }
 
 void set_RF_Gain(int rfgain)
 {
   float gain_setpoint;
-  gain_setpoint =( (float)rfgain / 32.0);
+  gain_setpoint = ((float)rfgain / 32.0);
   amp1.gain(gain_setpoint);
 }
 
@@ -865,7 +861,6 @@ void terminate_transmit_armed(void)
   delay(2);
   receive_sequence();
   sButtonData[3].state = false;
-  //drawButton(3);
 }
 
 int testButton(uint8_t index)

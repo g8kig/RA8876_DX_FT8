@@ -98,7 +98,7 @@ void autoseq_on_touch(const Decode *msg)
 {
     if (!msg)
         return;
-    
+
     parse_rcvd_msg(msg);
     if (strncmp(msg->call_to, ctx.mycall, 14) != 0)
     {
@@ -116,7 +116,7 @@ void autoseq_on_touch(const Decode *msg)
     strncpy(ctx.dxcall, msg->call_from, sizeof(ctx.dxcall) - 1);
     strncpy(ctx.dxgrid, msg->locator, sizeof(ctx.dxgrid) - 1);
     ctx.snr_tx = msg->snr;
-    set_state(Skip_Tx1 ? AS_REPORT : AS_REPLYING,   Skip_Tx1 ? TX2 : TX1,    MAX_TX_RETRY);
+    set_state(Skip_Tx1 ? AS_REPORT : AS_REPLYING, Skip_Tx1 ? TX2 : TX1, MAX_TX_RETRY);
 }
 
 /* === Called for **every** new decode (auto response) === */
@@ -193,8 +193,7 @@ void autoseq_get_qso_state(char out_text[MAX_LINE_LEN])
     snprintf(out_text, MAX_LINE_LEN,
              " %.4s tried:%1u",
              states[ctx.state],
-             ctx.retry_counter
-    );
+             ctx.retry_counter);
 }
 
 /* === Slot timer / time‑out manager === */
