@@ -251,7 +251,7 @@ bool open_stationData_file(void)
 
 void display_station_data(int x, int y)
 {
-  char str[13];
+  char str[16];
   sprintf(str, "%7s %4s", Station_Call, Short_Station_Locator);
 
   tft.textColor(YELLOW, BLACK);
@@ -326,7 +326,7 @@ void Be_Patient(void)
 
 void update_message_log_display(int mode)
 {
-  const char blank[] = "                      ";
+  const char blank[] = "                     ";
 
   for (int i = 0; i < max_log_messages - 1; i++)
   {

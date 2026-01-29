@@ -113,8 +113,8 @@ void autoseq_on_touch(const Decode *msg)
     }
 
     // Must be handling TX6
-    strncpy(ctx.dxcall, msg->call_from, sizeof(ctx.dxcall) - 1);
-    strncpy(ctx.dxgrid, msg->locator, sizeof(ctx.dxgrid) - 1);
+    strncpy(ctx.dxcall, msg->call_from, sizeof(ctx.dxcall));
+    strncpy(ctx.dxgrid, msg->locator, sizeof(ctx.dxgrid));
     ctx.snr_tx = msg->snr;
     set_state(Skip_Tx1 ? AS_REPORT : AS_REPLYING, Skip_Tx1 ? TX2 : TX1, MAX_TX_RETRY);
 }
@@ -278,7 +278,7 @@ static void set_state(autoseq_state_t s, tx_msg_t first_tx, int limit)
 }
 
 /* Build printable FT8 text ("<CALL> <CALL> <LOC/RPT>") */
-static void format_tx_text(tx_msg_t id, char out[MAX_MSG_LEN])
+static void format_tx_text(tx_msg_t id, char *out)
 {
     if (!out)
     {
@@ -292,18 +292,18 @@ static void format_tx_text(tx_msg_t id, char out[MAX_MSG_LEN])
     switch (id)
     {
     case TX1:
-        snprintf(out, MAX_MSG_LEN, "%s %s %s", ctx.dxcall, ctx.mycall, ctx.mygrid);
+        snprintf(out, MAX_MSG_LEN, "%14s %14s %6s", ctx.dxcall, ctx.mycall, ctx.mygrid);
         break;
     case TX2:
-        snprintf(out, MAX_MSG_LEN, "%s %s %+d", ctx.dxcall, ctx.mycall, ctx.snr_tx);
+        snprintf(out, MAX_MSG_LEN, "%14s %14s %+d", ctx.dxcall, ctx.mycall, ctx.snr_tx);
         Target_RSL = ctx.snr_tx;
         break;
     case TX3:
-        snprintf(out, MAX_MSG_LEN, "%s %s R%+d", ctx.dxcall, ctx.mycall, ctx.snr_tx);
+        snprintf(out, MAX_MSG_LEN, "%14s %14s R%+d", ctx.dxcall, ctx.mycall, ctx.snr_tx);
         Target_RSL = ctx.snr_tx;
         break;
     case TX4:
-        snprintf(out, MAX_MSG_LEN, "%s %s RR73", ctx.dxcall, ctx.mycall);
+        snprintf(out, MAX_MSG_LEN, "%14s %14s RR73", ctx.dxcall, ctx.mycall);
         if (!ctx.logged)
         {
             write_ADIF_Log();
@@ -312,7 +312,7 @@ static void format_tx_text(tx_msg_t id, char out[MAX_MSG_LEN])
         }
         break;
     case TX5:
-        snprintf(out, MAX_MSG_LEN, "%s %s 73", ctx.dxcall, ctx.mycall);
+        snprintf(out, MAX_MSG_LEN, "%14s %14s 73", ctx.dxcall, ctx.mycall);
         if (!ctx.logged)
         {
             write_ADIF_Log();
@@ -338,17 +338,17 @@ static void format_tx_text(tx_msg_t id, char out[MAX_MSG_LEN])
                 cq_str = CQ;
                 break;
             }
-            snprintf(out, MAX_MSG_LEN, "%s %s %s", cq_str, ctx.mycall, ctx.mygrid);
+            snprintf(out, MAX_MSG_LEN, "%14s %14s %s", cq_str, ctx.mycall, ctx.mygrid);
         }
         else
         {
             switch (Free_Index)
             {
             case 0:
-                strncpy(out, Free_Text1, 13);
+                strcpy(out, Free_Text1);
                 break;
             case 1:
-                strncpy(out, Free_Text2, 13);
+                strcpy(out, Free_Text2);
 
                 break;
             default:
@@ -367,7 +367,7 @@ static void parse_rcvd_msg(const Decode *msg)
     if (msg->sequence == Seq_Locator)
     {
         ctx.rcvd_msg_type = TX1;
-        strncpy(ctx.dxgrid, msg->locator, sizeof(ctx.dxgrid) - 1);
+        strncpy(ctx.dxgrid, msg->locator, sizeof(ctx.dxgrid));
     }
     else
     {
@@ -375,11 +375,7 @@ static void parse_rcvd_msg(const Decode *msg)
         {
             ctx.rcvd_msg_type = TX5;
         }
-        else if (strcmp(msg->locator, "RR73") == 0)
-        {
-            ctx.rcvd_msg_type = TX4;
-        }
-        else if (strcmp(msg->locator, "RRR") == 0)
+        else if ((strcmp(msg->locator, "RR73") == 0) || (strcmp(msg->locator, "RRR") == 0))
         {
             ctx.rcvd_msg_type = TX4;
         }
@@ -403,7 +399,7 @@ static bool generate_response(const Decode *msg, bool override)
     }
 
     // Update the DX call and SNR
-    strncpy(ctx.dxcall, msg->call_from, sizeof(ctx.dxcall) - 1);
+    strcpy(ctx.dxcall, msg->call_from);
     ctx.snr_tx = msg->snr;
 
     if (override)
@@ -431,7 +427,7 @@ static bool generate_response(const Decode *msg, bool override)
         }
     }
     // Populating Target_Call
-    strncpy(Target_Call, msg->call_from, 7);
+    strncpy(Target_Call, msg->call_from, sizeof(Target_Call));
 
     // Populating Station_RSL
     if (ctx.rcvd_msg_type == TX2 || ctx.rcvd_msg_type == TX3)
@@ -453,7 +449,7 @@ static bool generate_response(const Decode *msg, bool override)
         {
         case TX1:
             // Populate Target_Locator
-            strncpy(Target_Locator, msg->locator, 5);
+            strncpy(Target_Locator, msg->locator, sizeof(msg->locator));
             set_state(AS_REPORT, TX2, MAX_TX_RETRY);
             return true;
         case TX2:
