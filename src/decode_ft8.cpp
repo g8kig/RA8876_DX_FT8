@@ -175,20 +175,20 @@ int ft8_decode(void)
           }
         }
 
-        // ignore hashed callsigns
-        if (*call_from != '<')
-        {
-          uint32_t frequency = (sBand_Data[BandIndex].Frequency * 1000) + new_decoded[num_decoded].freq_hz;
-          addReceivedRecord(call_from, frequency, display_RSL);
-        }
-
-        if (memcmp(new_decoded[num_decoded].call_to, "CQ ", 3) == 0)
+        if ((memcmp(new_decoded[num_decoded].call_to, "CQ\0", 3) == 0) || (memcmp(new_decoded[num_decoded].call_to, "CQ ", 3) == 0))
         {
           new_decoded[num_decoded].calling_CQ = 1;
         }
         else
         {
           new_decoded[num_decoded].calling_CQ = 0;
+        }
+
+        // ignore hashed callsigns
+        if (*call_from != '<')
+        {
+          uint32_t frequency = (sBand_Data[BandIndex].Frequency * 1000) + new_decoded[num_decoded].freq_hz;
+          addReceivedRecord(call_from, frequency, display_RSL);
         }
 
         ++num_decoded;
