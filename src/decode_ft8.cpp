@@ -264,17 +264,15 @@ void display_messages(Decode new_decoded[], int decoded_messages)
 
     MsgColor color = White;
     char message[MAX_MSG_LEN];
-
     snprintf(message, MAX_LINE_LEN, "%s %s %s", call_to, call_from, locator);
     message[MAX_LINE_LEN - 1] = '\0'; // Make sure it fits the display region
 
-    if (new_decoded[i].calling_CQ == 1)
+    if (new_decoded[i].calling_CQ)
     {
       color = Green;
 
       if (!check_call_list(i) && !check_log_list(i))
       {
-
         if (new_decoded[i].sync_score > max_sync_score)
         {
           max_sync_score = new_decoded[i].sync_score;
@@ -289,6 +287,7 @@ void display_messages(Decode new_decoded[], int decoded_messages)
     {
       color = Red;
     }
+
     // Mark own TX in yellow (WSJT-X)
     if (was_txing)
     {

@@ -98,8 +98,6 @@ char Station_Call[11];         // six character call sign + /0
 char Station_Locator[7];       // up to six character locator  + /0
 char Short_Station_Locator[5]; // four character locator  + /0
 
-uint16_t currentFrequency;
-
 uint32_t current_time, start_time, ft8_time;
 int ft8_flag;
 int FT_8_counter;
@@ -328,10 +326,9 @@ void loop()
           QSO_xmit = 1;
           tx_display_update();
         }
-
         else if (Auto_QSO)
-
-        { // Auto_QSO_Start
+        {
+          // Auto_QSO_Start
           if (Valid_CQ_Candidate)
           {
             process_selected_Station(master_decoded, max_sync_score_index);
@@ -437,6 +434,7 @@ void update_synchronization()
     {
       autoseq_tick();
     }
+    
     was_txing = 0;
 
     ft8_flag = 1;
@@ -458,6 +456,7 @@ void update_synchronization()
 
     // Log the TX
     if (strindex(autoseq_txbuf, "CQ") < 0)
+    // ??? if ((memcmp(autoseq_txbuf, "CQ ", 3) == 0) || (memcmp(autoseq_txbuf, "CQ\0", 3) == 0))
     {
       strcpy(current_message, autoseq_txbuf);
       update_message_log_display(1);
