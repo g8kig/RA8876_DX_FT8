@@ -145,18 +145,22 @@ static void update_offset_waterfall(int offset)
 
   for (int k = ft8_min_bin; k < ft8_buffer; k++)
   {
+    uint16_t colour = BLUE;
     if (xmit_flag == 0)
+    {
       tft.drawPixel(2 * (k - ft8_min_bin), WF_counter, WFPalette[WF_index[k]]);
+    }
     else
     {
+      colour = RED;
       if (2 * (k - ft8_min_bin) >= display_cursor_line && 2 * (k - ft8_min_bin) <= display_cursor_line + 16)
         tft.drawPixel(2 * (k - ft8_min_bin), WF_counter, WFPalette[WF_index[k]]);
       else
         tft.drawPixel(2 * (k - ft8_min_bin), WF_counter, BLACK);
     }
 
-    tft.drawPixel(display_cursor_line, WF_counter, RED);
-    tft.drawPixel(display_cursor_line + 16, WF_counter, RED);
+    tft.drawPixel(display_cursor_line, WF_counter, colour);
+    tft.drawPixel(display_cursor_line + 16, WF_counter, colour);
   }
 
   WF_counter++;
