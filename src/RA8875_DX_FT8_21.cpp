@@ -456,7 +456,7 @@ void update_synchronization()
 
     // Log the TX
     if (strindex(autoseq_txbuf, "CQ") < 0)
-    // ??? if ((memcmp(autoseq_txbuf, "CQ ", 3) == 0) || (memcmp(autoseq_txbuf, "CQ\0", 3) == 0))
+    //if ((memcmp(autoseq_txbuf, "CQ ", 3) == 0) || (memcmp(autoseq_txbuf, "CQ\0", 3) == 0))
     {
       strcpy(current_message, autoseq_txbuf);
       update_message_log_display(1);
