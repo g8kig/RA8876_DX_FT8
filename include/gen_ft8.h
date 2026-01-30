@@ -19,7 +19,7 @@ void erase_CQ(void);
 void genft8(const uint8_t *payload, uint8_t *itone);
 
 extern int Station_RSL;
-extern char Target_Call[11]; // six character call sign + /0
+extern char Target_Call[14]; // six character call sign + /0
 extern int Target_RSL;
 extern char Target_Locator[7]; // four character locator  + /0
 extern char Free_Text1[MESSAGE_SIZE];

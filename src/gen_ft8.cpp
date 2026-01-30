@@ -30,7 +30,7 @@
 #include "main.h"
 #include "button.h"
 
-char Target_Call[11];   // six character call sign + /0
+char Target_Call[14];   // six character call sign + /0
 char Target_Locator[7]; // six character locator  + /0
 int Target_RSL;         // four character RSL  + /0
 int Station_RSL;
