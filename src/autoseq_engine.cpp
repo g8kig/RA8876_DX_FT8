@@ -55,7 +55,7 @@ typedef struct
     char mygrid[LOCATOR_SIZE];
     char dxcall[CALLSIGN_SIZE];
     char dxgrid[LOCATOR_SIZE];
-    int snr_tx; /* SNR we report to DX (‑dB) */
+    int snr_tx; /* SNR we report to DX (dB) */
     int retry_counter;
     int retry_limit;
     bool logged; /* true => QSO logged */
@@ -80,8 +80,8 @@ static void write_worked_qso();
 void autoseq_init(const char *myCall, const char *myGrid)
 {
     memset(&ctx, 0, sizeof(ctx));
-    strncpy(ctx.mycall, myCall, CALLSIGN_SIZE-1);
-    strncpy(ctx.mygrid, myGrid, LOCATOR_SIZE-1);
+    strncpy(ctx.mycall, myCall, CALLSIGN_SIZE - 1);
+    strncpy(ctx.mygrid, myGrid, LOCATOR_SIZE - 1);
     ctx.state = AS_IDLE;
 }
 
@@ -378,7 +378,7 @@ static bool generate_response(const Decode *msg, bool override)
 
     if (override)
     {
-        // Reset own internal state to macth rcve_msg_type
+        // Reset own internal state to match rcvd_msg_type
         switch (ctx.rcvd_msg_type)
         {
         case TX1:
@@ -499,13 +499,20 @@ static bool generate_response(const Decode *msg, bool override)
         }
         return false;
 
-    // Since 73 is sent only once, this should never be reached
+    // Handle 73 message state
     case AS_SIGNOFF:
         switch (ctx.rcvd_msg_type)
         {
-        // DX hasn't received our TX5. Retry
+        // DX hasn't received our TX5. Retry once
         case TX4:
+            if (ctx.retry_counter < 1)
+            {
+                ctx.retry_counter++;
+                set_state(AS_SIGNOFF, TX5, 0);
+                return true;
+            }
             break;
+        // QSO complete (TX5 state)
         default:
             set_state(AS_IDLE, TX_UNDEF, 0);
             break;
@@ -523,10 +530,13 @@ static void write_worked_qso()
     static const char band_strs[NumBands][4] = {
         "40", "30", "20", "17", "15", "12", "10"};
     char *buf = add_worked_qso();
+    if (!buf)
+        return;
+
     int printed = snprintf(buf, MAX_LINE_LEN, "%.3s %.12s",
                            band_strs[BandIndex],
                            ctx.dxcall);
-    if (printed < 0)
+    if (printed < 0 || printed >= MAX_LINE_LEN)
     {
         return;
     }
@@ -534,19 +544,27 @@ static void write_worked_qso()
     char rsl[RSL_SIZE]; // space + sign + 2 digits + null = 5
     // Check if RX RSL would fit
     int needed = snprintf(rsl, sizeof(rsl), " %d", Station_RSL);
-    if (printed + needed <= MAX_LINE_LEN - 1)
+    if (needed > 0 && printed + needed < MAX_LINE_LEN)
     {
-        strncpy(buf + printed, rsl, needed + 1);
+        strncpy(buf + printed, rsl, MAX_LINE_LEN - printed - 1);
         printed += needed;
+        buf[printed] = '\0';
     }
     else
     {
+        buf[printed] = '\0';
         return;
     }
+
     // Check if TX RSL would fit
     needed = snprintf(rsl, sizeof(rsl), " %d", Target_RSL);
-    if (printed + needed <= MAX_LINE_LEN - 1)
+    if (needed > 0 && printed + needed < MAX_LINE_LEN)
     {
-        strncpy(buf + printed, rsl, needed + 1);
+        strncpy(buf + printed, rsl, MAX_LINE_LEN - printed - 1);
+        buf[printed + needed] = '\0';
+    }
+    else
+    {
+        buf[printed] = '\0';
     }
 }
