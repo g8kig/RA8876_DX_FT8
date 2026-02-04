@@ -100,7 +100,7 @@ void autoseq_on_touch(const Decode *msg)
         return;
 
     parse_rcvd_msg(msg);
-    if (strncmp(msg->call_to, ctx.mycall, LOCATOR_SIZE) != 0)
+    if (strncmp(msg->call_to, ctx.mycall, CALLSIGN_SIZE) != 0)
     {
         // Not addresses to me, treat it as if it's a CQ/TX6
         ctx.rcvd_msg_type = TX6;
