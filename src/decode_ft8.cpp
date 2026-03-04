@@ -52,13 +52,13 @@ static int num_qsos = 0;
 static int validate_locator(const char *QSO_locator);
 
 const int auto_call_limit = 10;
-const int auto_logged_limit = 100;
+const int auto_logged_limit = 50;
 
 int max_sync_score;
 int max_sync_score_index;
 Called_Stations call_list[auto_call_limit];
+//Called_Stations auto_logged_list[auto_logged_limit];
 Called_Stations auto_logged_list[auto_logged_limit];
-
 int auto_logged;
 int Valid_CQ_Candidate;
 
@@ -305,13 +305,25 @@ void store_CQ_Call(void)
   strcpy(call_list[auto_call_limit - 1].call, new_decoded[max_sync_score_index].call_from);
 }
 
+
 void store_logged_CQ_Call(const char *call)
 {
 
-  strcpy(auto_logged_list[auto_logged].call, call); // store candidate call so we do not duplicate call later
+  const char blank[] = "             ";
+
+  for (int i = 0; i < auto_logged_limit - 1; i++)
+  {
+    strcpy(auto_logged_list[i].call, blank);
+    strcpy(auto_logged_list[i].call, auto_logged_list[i + 1].call);
+  }
+
+  strcpy(auto_logged_list[auto_logged_limit - 1].call, blank);
+  strcpy(auto_logged_list[auto_logged_limit - 1].call, call);
+
   auto_logged++;
   display_value(0, 520, auto_logged);
 }
+
 
 void clear_auto_memories(void)
 {
@@ -445,7 +457,8 @@ int check_log_list(int message_index)
 
   int test = 0;
 
-  for (int i = 0; i < auto_logged; i++)
+  //for (int i = 0; i < auto_logged; i++)
+  for (int i = 0; i < auto_logged_limit; i++)
   {
     if (strcmp(auto_logged_list[i].call, new_decoded[message_index].call_from) == 0)
     {

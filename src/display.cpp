@@ -288,7 +288,7 @@ void display_revision_level(void)
   tft.setCursor(0, 270);
   tft.write("Please Wait While", 17);
   tft.setCursor(0, 300);
-  tft.write("Gears & Pulleys", 15);
+  tft.write("Gears & Pulleys  ", 17);
   tft.setCursor(0, 330);
   tft.write("Are Aligned", 12);
 

@@ -42,8 +42,8 @@ void clear_reply_message_box(void)
   tft.fillRect(left_hand_message, 100, 290, 420, BLACK);
 }
 
-char Free_Text1[MESSAGE_SIZE] = "FreeText 1   ";
-char Free_Text2[MESSAGE_SIZE] = "FreeText 2   ";
+char Free_Text1[MESSAGE_SIZE] = " FreeText 1   ";
+char Free_Text2[MESSAGE_SIZE] = " FreeText 2   ";
 
 static const char CQ_message[] = "                  ";
 
