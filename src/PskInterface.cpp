@@ -66,13 +66,17 @@ void getTime(void)
       Wire1.requestFrom(ESP32_I2C_ADDRESS, sizeof(RTC_Time));
       uint8_t *ptr = (uint8_t *)&rtcTime;
       size_t size = 0;
-      for (;;)
+      // Bounded read with a timeout so a silent ESP32 can't hang the loop.
+      const uint32_t start_ms = millis();
+      while (size < sizeof(RTC_Time))
       {
         if (Wire1.available())
         {
           ptr[size++] = Wire1.read();
-          if (size >= sizeof(RTC_Time))
-            break;
+        }
+        else if (millis() - start_ms > 100)
+        {
+          break; // timed out waiting for RTC data
         }
       }
 

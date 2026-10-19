@@ -201,8 +201,8 @@ int validate_locator(const char *QSO_locator)
 
 int strindex(const char *s, const char *t)
 {
-  int result = -1;
-
+  // Return the index of the FIRST occurrence of t in s (-1 if not found),
+  // matching WSJT-X semantics.
   for (int i = 0; s[i] != '\0'; i++)
   {
     int k = 0;
@@ -210,9 +210,9 @@ int strindex(const char *s, const char *t)
       ;
 
     if (k > 0 && t[k] == '\0')
-      result = i;
+      return i; // found it — stop at the first match
   }
-  return result;
+  return -1;
 }
 
 void set_QSO_Xmit_Freq(int freq)

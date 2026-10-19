@@ -25,6 +25,10 @@ static int ldpc_check(uint8_t codeword[]);
 static float fast_tanh(float x);
 static float fast_atanh(float x);
 
+// REINSERTED FOR TEST
+static float ldpc_m[83][174];
+static float ldpc_e[83][174];
+
 // Packs a string of bits each represented as a zero/non-zero byte in plain[],
 // as a string of packed bits starting from the MSB of the first byte of packed[]
 void pack_bits(const uint8_t plain[], int num_bits, uint8_t packed[])
@@ -50,88 +54,6 @@ void pack_bits(const uint8_t plain[], int num_bits, uint8_t packed[])
       ++byte_idx;
     }
   }
-}
-
-// codeword is 174 log-likelihoods.
-// plain is a return value, 174 ints, to be 0 or 1.
-// max_iters is how hard to try.
-// ok == 87 means success.
-void ldpc_decode(float *codeword, int max_iters, uint8_t plain[], int *ok)
-{
-  float m[M][N]; // ~60 kB
-  float e[M][N]; // ~60 kB
-  int min_errors = M;
-
-  for (int j = 0; j < M; j++)
-  {
-    for (int i = 0; i < N; i++)
-    {
-      m[j][i] = codeword[i];
-      e[j][i] = 0.0f;
-    }
-  }
-
-  for (int iter = 0; iter < max_iters; iter++)
-  {
-    for (int j = 0; j < M; j++)
-    {
-      for (int ii1 = 0; ii1 < kNrw[j]; ii1++)
-      {
-        int i1 = kNm[j][ii1] - 1;
-        float a = 1.0f;
-        for (int ii2 = 0; ii2 < kNrw[j]; ii2++)
-        {
-          int i2 = kNm[j][ii2] - 1;
-          if (i2 != i1)
-          {
-            a *= fast_tanh(-m[j][i2] / 2.0f);
-          }
-        }
-        e[j][i1] = logf((1 - a) / (1 + a));
-      }
-    }
-
-    for (int i = 0; i < N; i++)
-    {
-      float l = codeword[i];
-      for (int j = 0; j < 3; j++)
-        l += e[kMn[i][j] - 1][i];
-      plain[i] = (l > 0) ? 1 : 0;
-    }
-
-    int errors = ldpc_check(plain);
-
-    if (errors < min_errors)
-    {
-      // Update the current best result
-      min_errors = errors;
-
-      if (errors == 0)
-      {
-        break; // Found a perfect answer
-      }
-    }
-
-    for (int i = 0; i < N; i++)
-    {
-      for (int ji1 = 0; ji1 < 3; ji1++)
-      {
-        int j1 = kMn[i][ji1] - 1;
-        float l = codeword[i];
-        for (int ji2 = 0; ji2 < 3; ji2++)
-        {
-          if (ji1 != ji2)
-          {
-            int j2 = kMn[i][ji2] - 1;
-            l += e[j2][i];
-          }
-        }
-        m[j1][i] = l;
-      }
-    }
-  }
-
-  *ok = min_errors;
 }
 
 //
@@ -160,6 +82,8 @@ static int ldpc_check(uint8_t codeword[])
 
 void bp_decode(float codeword[], int max_iters, uint8_t plain[], int *ok)
 {
+  ldpc_m[0][0] = codeword[0];
+  ldpc_e[82][173] = 0.0f;
   float tov[N][3];
   float toc[M][7];
 

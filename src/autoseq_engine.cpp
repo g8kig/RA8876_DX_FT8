@@ -319,11 +319,13 @@ static void format_tx_text(tx_msg_t id, char *out)
             switch (Free_Index)
             {
             case 0:
-                strncpy(out, Free_Text1, MAX_MSG_LEN);
+                // snprintf always null-terminates; %.*s caps the copy at one
+                // byte short of the buffer so a long Free_Text1 can't leave
+                // `out` unterminated.
+                snprintf(out, MAX_MSG_LEN, "%.*s", (int)MAX_MSG_LEN - 1, Free_Text1);
                 break;
             case 1:
-                strncpy(out, Free_Text2, MAX_MSG_LEN);
-
+                snprintf(out, MAX_MSG_LEN, "%.*s", (int)MAX_MSG_LEN - 1, Free_Text2);
                 break;
             default:
                 break;

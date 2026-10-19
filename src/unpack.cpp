@@ -238,18 +238,22 @@ static int unpack_telemetry(const uint8_t *a71, char *telemetry)
     carry = (a71[i] & 0x01);
   }
 
-  // Convert b71 to hexadecimal string
-  for (int i = 0; i < 9; ++i)
+  // Convert b71 to hexadecimal string (18 hex chars + NUL).
+  // The destination field is documented as "at least 14 bytes", so clamp the
+  // output to fit and always null-terminate to avoid a stack buffer overflow.
+  const size_t max_chars = 13; // leave room for the NUL terminator in a 14-byte field
+  size_t written = 0;
+  for (int i = 0; i < 9 && written + 2 <= max_chars; ++i)
   {
     uint8_t nibble1 = (b71[i] >> 4);
     uint8_t nibble2 = (b71[i] & 0x0F);
     char c1 = (nibble1 > 9) ? (nibble1 - 10 + 'A') : nibble1 + '0';
     char c2 = (nibble2 > 9) ? (nibble2 - 10 + 'A') : nibble2 + '0';
-    telemetry[i * 2] = c1;
-    telemetry[i * 2 + 1] = c2;
+    telemetry[written++] = c1;
+    telemetry[written++] = c2;
   }
 
-  telemetry[18] = 0;
+  telemetry[written] = 0;
   return 0;
 }
 

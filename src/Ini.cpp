@@ -102,8 +102,14 @@ void parse_ini(const char *buffer, size_t buffer_len, ini_data_t *ini_data)
             {
                 ini_entry_t *entry = &current_section_ptr->entries[ini_data->sections[current_section].num_entries++];
 
+                // equals_pos points into the local null-terminated `line`, so
+                // measure the value length from line itself (not buffer_end).
+                // This avoids reading past the input buffer and prevents a
+                // long value from spilling across subsequent lines.
+                const char *val_start = equals_pos + 1;
+                size_t val_len = strlen(val_start);
                 copy_and_trim(entry->key, line, min((size_t)(equals_pos - line), sizeof(entry->key) - 1));
-                copy_and_trim(entry->value, equals_pos + 1, min((size_t)(buffer_end - equals_pos + 1), sizeof(entry->value) - 1));
+                copy_and_trim(entry->value, val_start, min(val_len, sizeof(entry->value) - 1));
 
                 entry->present = true;
             }
